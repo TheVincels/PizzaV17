@@ -3,16 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>V17 Pizzeria | Horno de Piedra</title>
-  
-  <!-- Fuentes estilo artesanal y limpio -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Iconos Phosphor -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <title>V17 Pizzeria | Horno Pizzero</title>
 
-  <!-- Leaflet CSS & JS para el minimapa gratuito del cliente y repartidor -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -20,41 +15,37 @@
     :root {
       --bg-dark: #0e0a08;
       --bg-card: #18120e;
-      --bg-card-hover: #221914;
+      --bg-elevated: #201813;
       --accent: #f3701e;
-      --accent-glow: rgba(243, 112, 30, 0.35);
+      --accent-soft: rgba(243, 112, 30, 0.14);
+      --accent-glow: rgba(243, 112, 30, 0.25);
       --gold: #f59e0b;
       --text-main: #f8f5f2;
       --text-muted: #a89f99;
-      --border: #2e231c;
+      --border: rgba(248, 245, 242, 0.09);
       --success: #22c55e;
       --danger: #ef4444;
-      --warning: #eab308;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      padding-bottom: 135px;
+      padding-bottom: 140px;
       overflow-x: hidden;
+      line-height: 1.45;
     }
 
-    .script-font {
-      font-family: 'Caveat', cursive;
-      letter-spacing: 0.5px;
-    }
-
-    /* HEADER */
     header {
       position: sticky;
       top: 0;
       z-index: 40;
-      background: rgba(14, 10, 8, 0.92);
-      backdrop-filter: blur(10px);
+      background: rgba(14, 10, 8, 0.88);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 12px 18px;
+      padding: 14px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -63,288 +54,553 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
       cursor: pointer;
       user-select: none;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--accent), #c2410c);
+      width: 40px;
+      height: 40px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(243, 112, 30, 0.35);
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      color: #fff;
-      box-shadow: 0 4px 15px var(--accent-glow);
-      transition: transform 0.1s;
+      font-size: 21px;
+      color: var(--accent);
+      transition: transform 0.12s ease;
     }
     .brand:active .brand-icon { transform: scale(0.92); }
 
-    .brand-text h1 { font-size: 17px; font-weight: 800; line-height: 1.1; }
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
 
-    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
     .cart-top-btn {
       position: relative;
       background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text-main);
-      width: 40px; height: 40px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; cursor: pointer;
-    }
-    .badge {
-      position: absolute; top: -4px; right: -4px;
-      background: var(--accent); color: #fff;
-      font-size: 11px; font-weight: 800;
-      width: 19px; height: 19px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      cursor: pointer;
     }
 
-    /* HERO BANNER */
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .hero {
       position: relative;
-      padding: 28px 20px;
-      background: radial-gradient(circle at top right, rgba(243, 112, 30, 0.25), transparent 65%),
-                  linear-gradient(to bottom, rgba(14,10,8,0.4), var(--bg-dark)),
-                  url('https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80') center/cover;
+      padding: 44px 20px 38px;
+      background:
+        linear-gradient(90deg, rgba(14, 10, 8, 0.92) 0%, rgba(14, 10, 8, 0.65) 55%, rgba(14, 10, 8, 0.25) 100%),
+        url('https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80') right center/cover;
       border-bottom: 1px solid var(--border);
     }
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(243, 112, 30, 0.18);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 4px 10px; border-radius: 20px;
-      font-size: 11px; font-weight: 700; margin-bottom: 10px;
-    }
-    .hero h2 { font-size: 28px; font-weight: 800; line-height: 1.15; margin-bottom: 6px; }
-    .hero h2 span { color: var(--accent); font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; }
-    .hero p { font-size: 13px; color: var(--text-muted); max-width: 310px; margin-bottom: 18px; }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #ea580c);
-      color: #fff; border: none; padding: 12px 20px;
-      border-radius: 30px; font-weight: 700; font-size: 14px;
-      display: inline-flex; align-items: center; gap: 8px;
-      cursor: pointer; box-shadow: 0 6px 20px var(--accent-glow);
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--gold);
+      margin-bottom: 10px;
     }
 
-    /* FEATURES STRIP */
+    .hero h2 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      max-width: 340px;
+      margin-bottom: 10px;
+    }
+
+    .hero h2 span {
+      color: var(--accent);
+      font-family: 'Caveat', cursive;
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 320px;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 8px 22px var(--accent-glow);
+    }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
     .features-strip {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 8px; padding: 14px 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 16px;
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       text-align: center;
+      align-items: center;
     }
-    .feat-item i { font-size: 22px; color: var(--accent); margin-bottom: 4px; }
+
+    .feat-item i { font-size: 20px; color: var(--accent); margin-bottom: 4px; }
     .feat-item div { font-size: 11px; font-weight: 700; }
     .feat-item span { font-size: 10px; color: var(--text-muted); display: block; }
 
-    /* SECTION TITLES & TABS */
-    .section-container { padding: 18px 16px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .section-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .section-title span { color: var(--accent); font-family: 'Caveat', cursive; font-size: 30px; }
+    .section-container { padding: 22px 16px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .section-title span {
+      color: var(--accent);
+      font-family: 'Caveat', cursive;
+      font-size: 28px;
+    }
 
     .cat-pills {
-      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
       scrollbar-width: none;
     }
     .cat-pills::-webkit-scrollbar { display: none; }
-    .pill {
-      background: var(--bg-card); border: 1px solid var(--border);
-      color: var(--text-muted); padding: 8px 16px; border-radius: 20px;
-      font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;
-    }
-    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* PRODUCT GRID */
+    .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .pill.active {
+      background: var(--text-main);
+      color: var(--bg-dark);
+      border-color: var(--text-main);
+      font-weight: 700;
+    }
+
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
+      gap: 14px;
     }
+
     .product-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       overflow: hidden;
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
       position: relative;
     }
-    .promo-ribbon {
-      position: absolute; top: 8px; left: 8px;
-      background: var(--danger); color: #fff;
-      font-size: 10px; font-weight: 800; padding: 3px 8px;
-      border-radius: 8px; text-transform: uppercase;
-    }
-    .product-img {
-      width: 100%; height: 120px; object-fit: cover;
-      background: #221914;
-    }
-    .product-body { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
-    .product-desc { font-size: 11px; color: var(--text-muted); line-height: 1.35; margin-bottom: 12px; }
-    .product-footer { display: flex; align-items: center; justify-content: space-between; }
-    .product-price { font-size: 18px; font-weight: 800; color: var(--accent); }
-    .add-btn {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--accent); color: #fff; border: none;
-      font-size: 18px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 10px var(--accent-glow);
-    }
-    .add-btn:active { transform: scale(0.9); }
 
-    /* FLOATING CART BAR */
+    .promo-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(14, 10, 8, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 128px;
+      object-fit: cover;
+      background: var(--bg-elevated);
+    }
+
+    .product-body {
+      padding: 13px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .product-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+
+    .product-price { font-size: 16px; font-weight: 800; color: var(--text-main); }
+    .coming-soon-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+
+    .add-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .add-btn:active { transform: scale(0.92); }
+
     .floating-cart {
       position: fixed;
-      bottom: 72px;
-      left: 14px; right: 14px;
-      background: linear-gradient(135deg, var(--accent), #d95308);
-      color: #fff;
+      bottom: 74px;
+      left: 14px;
+      right: 14px;
+      background: var(--bg-elevated);
+      border: 1px solid rgba(243, 112, 30, 0.45);
+      color: var(--text-main);
       padding: 13px 18px;
       border-radius: 16px;
       display: none;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
       z-index: 45;
       cursor: pointer;
-      animation: slideUp 0.25s ease;
     }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* BOTTOM NAVIGATION (2 pestañas: Inicio y Mi Pedido) */
+    .floating-cart-badge {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       height: 64px;
-      background: #130e0b;
+      background: rgba(16, 12, 10, 0.95);
+      backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(2, 1fr);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       z-index: 50;
     }
+
     .nav-item {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 4px; color: var(--text-muted); text-decoration: none;
-      font-size: 12px; font-weight: 600; background: none; border: none; cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
       position: relative;
     }
-    .nav-item i { font-size: 22px; }
+    .nav-item i { font-size: 21px; }
     .nav-item.active { color: var(--accent); }
     .nav-item.active::after {
-      content: ''; position: absolute; bottom: 0; width: 42px; height: 3px;
-      background: var(--accent); border-radius: 3px 3px 0 0;
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 44px;
+      height: 2.5px;
+      background: var(--accent);
+      border-radius: 2px 2px 0 0;
     }
 
-    /* VIEWS */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* TRACKER (MI PEDIDO) */
     .tracker-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 18px; margin-bottom: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
     }
-    .status-steps { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; position: relative; }
+
+    .status-steps { display: flex; flex-direction: column; gap: 15px; margin-top: 18px; }
     .step { display: flex; align-items: flex-start; gap: 12px; opacity: 0.4; }
     .step.done, .step.current { opacity: 1; }
     .step-dot {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--border); display: flex; align-items: center; justify-content: center;
-      font-size: 14px; flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
     }
-    .step.done .step-dot { background: var(--success); color: #fff; }
-    .step.current .step-dot { background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--accent); }
-    .step.delay .step-dot { background: var(--danger); color: #fff; }
+    .step.done .step-dot { background: var(--success); border-color: var(--success); color: #fff; }
+    .step.current .step-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    /* MODALS */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-      z-index: 120; display: none; align-items: center; justify-content: center;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 12px;
     }
     .modal-overlay.open { display: flex; }
+
     .modal-sheet {
-      background: var(--bg-card); width: 100%; max-width: 520px;
-      max-height: 90vh; overflow-y: auto;
-      border-radius: 20px; border: 1px solid var(--border);
+      background: var(--bg-card);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 20px;
+      border: 1px solid var(--border);
       padding: 0 18px 24px 18px;
-      position: relative;
     }
+
     .modal-sticky-header {
-      position: sticky; top: 0; z-index: 20;
+      position: sticky;
+      top: 0;
+      z-index: 20;
       background: var(--bg-card);
       padding: 16px 0 12px 0;
       margin-bottom: 12px;
       border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .modal-close-btn {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--bg-dark); border: 1px solid var(--border);
-      color: var(--text-main); font-size: 20px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0;
-    }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted); }
-    .form-control {
-      width: 100%; padding: 11px 14px; border-radius: 12px;
-      background: var(--bg-dark); border: 1px solid var(--border);
-      color: var(--text-main); font-family: inherit; font-size: 14px;
-    }
-    #client-map, .driver-map { height: 170px; width: 100%; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px; z-index: 1; }
 
-    /* ADMIN PANEL */
+    .modal-close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .form-group { margin-bottom: 13px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .saved-profile-note {
+      font-size: 11px;
+      color: var(--success);
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    #client-map, .driver-map {
+      height: 165px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-top: 6px;
+      z-index: 1;
+    }
+
     .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
     .admin-tab {
-      padding: 10px 6px; border-radius: 12px; background: var(--bg-card);
-      border: 1px solid var(--border); color: var(--text-muted);
-      font-size: 12px; font-weight: 700; text-align: center; cursor: pointer;
+      padding: 10px 6px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
     }
     .admin-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
     .sub-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
     .sub-btn {
-      flex: 1; padding: 8px; border-radius: 10px; background: var(--bg-dark);
-      border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer;
+      flex: 1;
+      padding: 8px;
+      border-radius: 10px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
     }
     .sub-btn.active { border-color: var(--gold); color: var(--gold); }
 
-    .order-ticket {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-left: 4px solid var(--accent); border-radius: 14px;
-      padding: 14px; margin-bottom: 12px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
     }
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-value { font-size: 20px; font-weight: 800; color: var(--gold); }
+
+    .order-ticket, .edit-product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
     .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .ticket-id { font-weight: 800; font-size: 15px; color: var(--accent); }
+    .ticket-id { font-weight: 800; font-size: 14px; color: var(--accent); }
     .ticket-time { font-size: 11px; color: var(--text-muted); }
-    .ticket-items { list-style: none; margin: 10px 0; padding: 8px; background: var(--bg-dark); border-radius: 10px; font-size: 13px; }
+    .ticket-items {
+      list-style: none;
+      margin: 10px 0;
+      padding: 8px 10px;
+      background: var(--bg-dark);
+      border-radius: 10px;
+      font-size: 13px;
+    }
     .ticket-items li { padding: 3px 0; display: flex; justify-content: space-between; }
+
     .btn-action {
-      width: 100%; padding: 11px; border-radius: 10px; border: none;
-      font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 6px;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     .btn-accept { background: var(--gold); color: #000; }
     .btn-next { background: var(--success); color: #fff; }
     .btn-maps { background: #2563eb; color: #fff; text-decoration: none; }
-    .btn-delay { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
+    .btn-delay { background: rgba(239, 68, 68, 0.14); border: 1px solid var(--danger); color: var(--danger); }
 
     .pill-status {
-      padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
     }
-    .paid-yes { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-    .paid-no { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .paid-yes { background: rgba(34, 197, 94, 0.18); color: var(--success); }
+    .paid-no { background: rgba(239, 68, 68, 0.18); color: var(--danger); }
   </style>
 </head>
 <body>
 
-  <!-- HEADER (Tocar 6 veces el logo abre el Admin secreto) -->
   <header>
     <div class="brand" id="secret-logo-trigger" title="V17 Pizzeria">
       <div class="brand-icon"><i class="ph-fill ph-fire"></i></div>
@@ -353,20 +609,19 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="cart-top-btn" onclick="openCartModal()">
+      <button type="button" class="cart-top-btn" onclick="openCartModal()">
         <i class="ph ph-shopping-cart"></i>
         <span class="badge" id="top-cart-count">0</span>
       </button>
     </div>
   </header>
 
-  <!-- VISTA 1: INICIO -->
   <main id="view-inicio" class="view active">
     <section class="hero">
-      <div class="hero-tag"><i class="ph-fill ph-map-pin"></i> Zacatepec, Morelos</div>
+      <div class="hero-eyebrow"><i class="ph-fill ph-map-pin"></i> Zacatepec, Morelos</div>
       <h2>El verdadero sabor en cada <span>rebanada</span></h2>
-      <p>Masa fresca hecha en casa, ingredientes de calidad y el auténtico sabor de horno artesanal.</p>
-      <button class="btn-primary" onclick="scrollToCatalog()">
+      <p>Masa fresca, ingredientes seleccionados y horneado en horno pizzero.</p>
+      <button type="button" class="btn-primary" onclick="scrollToCatalog()">
         <i class="ph-fill ph-pizza"></i> Ver Especialidades
       </button>
     </section>
@@ -374,37 +629,35 @@
     <section class="features-strip">
       <div class="feat-item">
         <i class="ph-fill ph-fire"></i>
-        <div>Hecha en casa</div>
-        <span>Horno artesanal</span>
+        <div>Horno pizzero</div>
+        <span>Masa fresca</span>
       </div>
       <div class="feat-item">
         <i class="ph-fill ph-moped"></i>
-        <div>A domicilio</div>
+        <div>Entrega local</div>
         <span>En Zacatepec</span>
       </div>
       <div class="feat-item">
         <i class="ph-fill ph-shield-check"></i>
         <div>Pedido seguro</div>
-        <span>Rastreo en vivo</span>
       </div>
     </section>
 
     <section class="section-container" id="catalog-section">
       <div class="section-header">
-        <h3 class="section-title">Promos y <span>Favoritas</span></h3>
+        <h3 class="section-title">Carta <span>V17</span></h3>
       </div>
       <div class="cat-pills">
-        <button class="pill active" onclick="filterMenu('todos', this)">Todo</button>
-        <button class="pill" onclick="filterMenu('promocion', this)">🔥 Promoción $75</button>
-        <button class="pill" onclick="filterMenu('pizzas', this)">🍕 Pizzas</button>
-        <button class="pill" onclick="filterMenu('postres', this)">🍰 Postres</button>
-        <button class="pill" onclick="filterMenu('bebidas', this)">🥤 Bebidas</button>
+        <button type="button" class="pill active" onclick="filterMenu('todos', this)">Todo</button>
+        <button type="button" class="pill" onclick="filterMenu('promocion', this)">Promoción $75</button>
+        <button type="button" class="pill" onclick="filterMenu('pizzas', this)">Pizzas</button>
+        <button type="button" class="pill" onclick="filterMenu('postres', this)">Postres</button>
+        <button type="button" class="pill" onclick="filterMenu('bebidas', this)">Bebidas</button>
       </div>
       <div class="products-grid" id="home-products"></div>
     </section>
   </main>
 
-  <!-- VISTA 2: MI PEDIDO (SEGUIMIENTO EN TIEMPO REAL) -->
   <main id="view-pedido" class="view">
     <section class="section-container">
       <div class="section-header">
@@ -412,58 +665,62 @@
       </div>
 
       <div class="tracker-card">
-        <label style="font-size:12px; color:var(--text-muted);">¿Buscas un pedido anterior? Ingresa tu folio o teléfono:</label>
+        <label style="font-size:12px; color:var(--text-muted);">Consulta un pedido por folio, correo o teléfono:</label>
         <div style="display:flex; gap:8px; margin-top:8px;">
-          <input type="text" id="search-order-input" class="form-control" placeholder="Ej. #104 o 7341234567">
-          <button class="btn-primary" style="border-radius:12px; padding:0 16px;" onclick="searchOrderByQuery()">Buscar</button>
+          <input type="text" id="search-order-input" class="form-control" placeholder="Ej. #104, correo o teléfono">
+          <button type="button" class="btn-primary" style="border-radius:12px; padding:0 16px;" onclick="searchOrderByQuery()">Buscar</button>
         </div>
       </div>
 
       <div id="active-order-container">
         <div class="tracker-card" style="text-align:center; padding:32px 16px;">
-          <i class="ph ph-pizza" style="font-size:44px; color:var(--text-muted); margin-bottom:10px;"></i>
+          <i class="ph ph-pizza" style="font-size:42px; color:var(--text-muted); margin-bottom:10px;"></i>
           <p style="font-size:14px; color:var(--text-muted);">Aún no tienes un pedido activo en este dispositivo.</p>
-          <button class="btn-primary" style="margin-top:14px;" onclick="switchView('inicio')">Ordenar ahora</button>
+          <button type="button" class="btn-primary" style="margin-top:14px;" onclick="switchView('inicio')">Ordenar ahora</button>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- VISTA 3: PANEL ADMIN (3 ESTACIONES + HISTORIAL) -->
+  <!-- PANEL ADMIN OPERATIVO Y DUEÑO -->
   <main id="view-admin" class="view">
     <section class="section-container">
       <div class="section-header">
-        <h3 class="section-title">Panel <span>Operativo</span></h3>
+        <h3 class="section-title" id="admin-panel-title">Panel <span>Operativo</span></h3>
         <button type="button" onclick="logoutAdmin()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:8px; font-size:12px;">Salir</button>
       </div>
 
-      <!-- 3 Roles -->
-      <div class="admin-tabs">
-        <button type="button" class="admin-tab active" onclick="setAdminRole('cocinero', this)">👨‍🍳 Cocinero</button>
-        <button type="button" class="admin-tab" onclick="setAdminRole('embarque', this)">📦 Embarque</button>
-        <button type="button" class="admin-tab" onclick="setAdminRole('repartidor', this)">🛵 Repartidor</button>
+      <!-- Barra de estaciones para roles operativos -->
+      <div class="admin-tabs" id="station-tabs-bar">
+        <button type="button" class="admin-tab active" id="tab-cocinero" onclick="setAdminRole('cocinero', this)">Cocinero</button>
+        <button type="button" class="admin-tab" id="tab-embarque" onclick="setAdminRole('embarque', this)">Embarque</button>
+        <button type="button" class="admin-tab" id="tab-repartidor" onclick="setAdminRole('repartidor', this)">Repartidor</button>
       </div>
 
-      <!-- Activos vs Historial de la estación -->
-      <div class="sub-toggle">
+      <!-- Sub-pestañas para estación operativa -->
+      <div class="sub-toggle" id="station-sub-toggle">
         <button type="button" class="sub-btn active" id="btn-sub-activos" onclick="setAdminSubTab('activos')">Pendientes en turno</button>
         <button type="button" class="sub-btn" id="btn-sub-historial" onclick="setAdminSubTab('historial')">Historial guardado</button>
+      </div>
+
+      <!-- Sub-pestañas para modo Dueño (2549) -->
+      <div class="sub-toggle" id="owner-sub-toggle" style="display:none;">
+        <button type="button" class="sub-btn active" id="btn-owner-reporte" onclick="setOwnerSubTab('reporte')">Ventas y Retardos</button>
+        <button type="button" class="sub-btn" id="btn-owner-menu" onclick="setOwnerSubTab('menu')">Editar Productos</button>
       </div>
 
       <div id="admin-orders-list"></div>
     </section>
   </main>
 
-  <!-- BARRA FLOTANTE DEL CARRITO -->
   <div class="floating-cart" id="floating-cart" onclick="openCartModal()">
     <div style="display:flex; align-items:center; gap:10px;">
-      <span id="float-count" style="background:rgba(0,0,0,0.25); padding:4px 10px; border-radius:10px; font-weight:800;">0</span>
-      <span style="font-weight:700; font-size:14px;">Ver carrito y pedir</span>
+      <span class="floating-cart-badge" id="float-count">0</span>
+      <span style="font-weight:700; font-size:13px;">Ver carrito y pedir</span>
     </div>
-    <span id="float-total" style="font-weight:800; font-size:16px;">$0</span>
+    <span id="float-total" style="font-weight:800; font-size:16px; color:var(--gold);">$0</span>
   </div>
 
-  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
   <nav class="bottom-nav">
     <button type="button" class="nav-item active" id="nav-inicio" onclick="switchView('inicio')">
       <i class="ph-fill ph-house"></i>
@@ -475,7 +732,7 @@
     </button>
   </nav>
 
-  <!-- MODAL CARRITO Y CHECKOUT -->
+  <!-- MODAL CARRITO Y REGISTRO DE CLIENTE -->
   <div class="modal-overlay" id="cart-modal">
     <div class="modal-sheet" id="cart-modal-sheet">
       <div class="modal-sticky-header">
@@ -485,33 +742,43 @@
 
       <div id="cart-items-list" style="margin-bottom:14px;"></div>
 
-      <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; font-size:17px; font-weight:800; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:14px;">
         <span>Total a pagar:</span>
         <span id="modal-total" style="color:var(--accent);">$0</span>
       </div>
 
+      <p class="saved-profile-note" id="saved-profile-note">✓ Datos de cliente cargados desde tu último pedido.</p>
+
       <form id="checkout-form" onsubmit="submitOrder(event)">
         <div class="form-group">
-          <label>Tu Nombre *</label>
+          <label>Nombre completo *</label>
           <input type="text" id="cust-name" class="form-control" required placeholder="Ej. Carlos Mendoza">
         </div>
         <div class="form-group">
-          <label>Teléfono / WhatsApp *</label>
+          <label>Correo electrónico *</label>
+          <input type="email" id="cust-email" class="form-control" required placeholder="Ej. carlos@correo.com">
+        </div>
+        <div class="form-group">
+          <label>Número de teléfono *</label>
           <input type="tel" id="cust-phone" class="form-control" required placeholder="10 dígitos">
         </div>
         <div class="form-group">
-          <label>Forma de Pago *</label>
+          <label>Domicilio completo y referencias *</label>
+          <input type="text" id="cust-address" class="form-control" required placeholder="Calle, número, colonia, color de fachada...">
+        </div>
+        <div class="form-group">
+          <label>Notas del pedido (opcional)</label>
+          <input type="text" id="cust-notes" class="form-control" placeholder="Ej. Tocar timbre, extra orégano...">
+        </div>
+        <div class="form-group">
+          <label>Forma de pago *</label>
           <select id="cust-payment" class="form-control">
-            <option value="efectivo">Pago en efectivo al recibir (Cobrar)</option>
+            <option value="efectivo">Efectivo al recibir (Cobrar)</option>
             <option value="pagado">Ya pagado por transferencia</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Dirección o Referencias *</label>
-          <input type="text" id="cust-address" class="form-control" required placeholder="Calle, número, colonia, color de casa...">
-        </div>
-        <div class="form-group">
-          <label>Marca tu ubicación exacta en el mapa (Arrastra el pin):</label>
+          <label>Ubicación en el mapa (Arrastra el pin):</label>
           <button type="button" onclick="locateUserGPS()" style="background:var(--bg-dark); border:1px solid var(--accent); color:var(--accent); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:6px; cursor:pointer;">
             <i class="ph-fill ph-crosshair"></i> Usar mi GPS actual
           </button>
@@ -519,7 +786,7 @@
         </div>
 
         <button type="submit" id="btn-submit-order" class="btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px; margin-top:8px;">
-          Confirmar y Enviar Pedido
+          Terminar Pedido
         </button>
       </form>
     </div>
@@ -529,7 +796,7 @@
   <div class="modal-overlay" id="admin-login-modal">
     <div class="modal-sheet" style="max-width:380px; padding-top:16px;">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Acceso Personal</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa la contraseña operativa para abrir las estaciones.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa tu clave de estación o administración.</p>
       <input type="password" id="admin-pass-input" class="form-control" placeholder="Contraseña" style="margin-bottom:12px;">
       <div style="display:flex; gap:8px;">
         <button type="button" onclick="closeAdminLogin()" style="flex:1; padding:11px; border-radius:10px; background:var(--bg-dark); border:1px solid var(--border); color:var(--text-muted); font-weight:700;">Cancelar</button>
@@ -538,14 +805,10 @@
     </div>
   </div>
 
-  <!-- FIREBASE SDK & LÓGICA DE LA APP -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, onSnapshot, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // =========================================================================
-    // 1. CONFIGURACIÓN DE FIREBASE (V17PIZZA)
-    // =========================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyCyq31sHToTb16-bt_A2QIbw2ypJyXSz0s",
       authDomain: "v17pizza.firebaseapp.com",
@@ -557,36 +820,39 @@
       measurementId: "G-DWMF4D02T0"
     };
 
-    // Contraseña del Panel Admin (Cocinero / Embarque / Repartidor)
-    const ADMIN_PASSWORD = "2549";
+    const ROLE_PASSWORDS = {
+      "1111": { mode: "station", role: "cocinero", label: "Cocinero" },
+      "1234": { mode: "station", role: "embarque", label: "Embarque / Cajero" },
+      "driver": { mode: "station", role: "repartidor", label: "Repartidor" },
+      "2549": { mode: "owner", role: "owner", label: "Administración" }
+    };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const ordersRef = collection(db, "pedidos");
+    const menuRef = collection(db, "productos");
 
-    // =========================================================================
-    // 2. CATÁLOGO DE PRODUCTOS (Incluye Promo $75, Pizzas, Postres y Bebidas)
-    // =========================================================================
-    const PRODUCTS = [
+    const DEFAULT_PRODUCTS = [
       {
         id: 'promo-75',
         name: 'Pizza Promoción $75',
         category: 'promocion',
         type: 'pizza',
         price: 75,
-        promo: '¡OFERTA!',
-        desc: 'Pizza artesanal individual/mediana de pepperoni o queso, recién salida del horno.',
-        img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=500&q=80'
+        comingSoon: false,
+        promo: 'PROMO $75',
+        desc: 'Masa fresca, salsa de tomate y queso horneado en horno pizzero.',
+        img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'pizza-pep',
-        name: 'Pepperoni Artesanal',
+        name: 'Pepperoni',
         category: 'pizzas',
         type: 'pizza',
         price: 99,
-        desc: 'Salsa de tomate casera, queso mozzarella fundido y pepperoni dorado.',
-        img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=500&q=80'
+        comingSoon: false,
+        desc: 'Mozzarella fundido, pepperoni dorado y toque de orégano.',
+        img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'pizza-haw',
@@ -594,8 +860,9 @@
         category: 'pizzas',
         type: 'pizza',
         price: 105,
-        desc: 'Jamón horneado, piña dulce caramelizada y queso mozzarella.',
-        img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80'
+        comingSoon: false,
+        desc: 'Jamón horneado, piña dulce y queso mozzarella.',
+        img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'pizza-mex',
@@ -603,8 +870,9 @@
         category: 'pizzas',
         type: 'pizza',
         price: 109,
-        desc: 'Chorizo artesanal, rajas de jalapeño, cebolla morada y queso.',
-        img: 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=500&q=80'
+        comingSoon: false,
+        desc: 'Chorizo artesanal, jalapeño en rajas, cebolla y queso.',
+        img: 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'postre-roles',
@@ -612,8 +880,9 @@
         category: 'postres',
         type: 'complemento',
         price: 45,
-        desc: 'Suaves roles glaseados horneados al día.',
-        img: 'https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=500&q=80'
+        comingSoon: true,
+        desc: 'Suaves y tibios del horno pizzero con glaseado ligero.',
+        img: 'https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'postre-japones',
@@ -621,8 +890,9 @@
         category: 'postres',
         type: 'complemento',
         price: 55,
-        desc: 'Esponjoso cheesecake estilo japonés.',
-        img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=500&q=80'
+        comingSoon: true,
+        desc: 'Textura aireada y suave de sabor delicado.',
+        img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=600&q=80'
       },
       {
         id: 'bebida-refresco',
@@ -630,25 +900,49 @@
         category: 'bebidas',
         type: 'complemento',
         price: 25,
-        desc: 'Coca-Cola, Sprite o Mundet bien frío.',
-        img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80'
+        comingSoon: false,
+        desc: 'Bien frío para acompañar tu orden.',
+        img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80'
       }
     ];
 
-    // =========================================================================
-    // 3. ESTADO GLOBAL Y RENDER DE PRODUCTOS
-    // =========================================================================
+    let products = [...DEFAULT_PRODUCTS];
+    let activeCategory = 'todos';
     let cart = [];
     let allOrders = [];
+    let adminMode = 'station';
     let currentRole = 'cocinero';
     let currentSubTab = 'activos';
+    let ownerSubTab = 'reporte';
     let selectedCoords = { lat: 18.6544, lng: -99.1906 };
     let clientMap, clientMarker;
 
+    function loadSavedCustomerProfile() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('v17_customer_profile') || 'null');
+        if (!saved) return;
+        if (saved.name) document.getElementById('cust-name').value = saved.name;
+        if (saved.email) document.getElementById('cust-email').value = saved.email;
+        if (saved.phone) document.getElementById('cust-phone').value = saved.phone;
+        if (saved.address) document.getElementById('cust-address').value = saved.address;
+        if (saved.coords && saved.coords.lat && saved.coords.lng) {
+          selectedCoords = saved.coords;
+        }
+        document.getElementById('saved-profile-note').style.display = 'block';
+      } catch (_) {}
+    }
+
+    function saveCustomerProfile(profile) {
+      try {
+        localStorage.setItem('v17_customer_profile', JSON.stringify(profile));
+      } catch (_) {}
+    }
+
     function renderProductCard(p) {
+      const isComing = Boolean(p.comingSoon);
       return `
         <div class="product-card">
-          ${p.promo ? `<span class="promo-ribbon">${p.promo}</span>` : ''}
+          ${p.promo && !isComing ? `<span class="promo-tag">${p.promo}</span>` : ''}
           <img src="${p.img}" alt="${p.name}" class="product-img" loading="lazy">
           <div class="product-body">
             <div>
@@ -656,32 +950,56 @@
               <div class="product-desc">${p.desc}</div>
             </div>
             <div class="product-footer">
-              <span class="product-price">$${p.price}</span>
-              <button type="button" class="add-btn" onclick="addToCart('${p.id}')">+</button>
+              ${isComing
+                ? `<span class="coming-soon-label">Próximamente</span>`
+                : `<span class="product-price">$${p.price}</span><button type="button" class="add-btn" onclick="addToCart('${p.id}')">+</button>`
+              }
             </div>
           </div>
         </div>
       `;
     }
 
-    document.getElementById('home-products').innerHTML = PRODUCTS.map(renderProductCard).join('');
+    function renderCatalog() {
+      const filtered = activeCategory === 'todos'
+        ? products
+        : products.filter(p => p.category === activeCategory);
+      document.getElementById('home-products').innerHTML = filtered.map(renderProductCard).join('');
+    }
 
     window.scrollToCatalog = () => {
       document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
     };
 
     window.filterMenu = (cat, btn) => {
+      activeCategory = cat;
       document.querySelectorAll('.pill').forEach(el => el.classList.remove('active'));
       btn.classList.add('active');
-      const filtered = cat === 'todos' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
-      document.getElementById('home-products').innerHTML = filtered.map(renderProductCard).join('');
+      renderCatalog();
     };
 
-    // =========================================================================
-    // 4. CARRITO DE COMPRAS Y MAPA DE CLIENTE
-    // =========================================================================
+    // Escuchar catálogo en Firebase (si aún no hay documentos, usa DEFAULT_PRODUCTS)
+    onSnapshot(menuRef, (snapshot) => {
+      if (!snapshot.empty) {
+        const remoteMap = new Map(snapshot.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
+        products = DEFAULT_PRODUCTS.map(def => remoteMap.get(def.id) || def);
+        remoteMap.forEach((val, key) => {
+          if (!DEFAULT_PRODUCTS.some(d => d.id === key)) products.push(val);
+        });
+      } else {
+        products = [...DEFAULT_PRODUCTS];
+      }
+      renderCatalog();
+      if (document.getElementById('view-admin').classList.contains('active') && adminMode === 'owner' && ownerSubTab === 'menu') {
+        renderAdminStation();
+      }
+    });
+
+    renderCatalog();
+
     window.addToCart = (id) => {
-      const prod = PRODUCTS.find(p => p.id === id);
+      const prod = products.find(p => p.id === id);
+      if (!prod || prod.comingSoon) return;
       const existing = cart.find(item => item.id === id);
       if (existing) existing.qty++;
       else cart.push({ ...prod, qty: 1 });
@@ -700,7 +1018,6 @@
     function updateCartUI() {
       const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
       const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
       document.getElementById('top-cart-count').textContent = totalQty;
       const floatBar = document.getElementById('floating-cart');
       if (totalQty > 0) {
@@ -738,6 +1055,7 @@
 
     window.openCartModal = () => {
       renderCartModalItems();
+      loadSavedCustomerProfile();
       const modal = document.getElementById('cart-modal');
       const sheet = document.getElementById('cart-modal-sheet');
       modal.classList.add('open');
@@ -752,12 +1070,21 @@
             selectedCoords = { lat: pos.lat, lng: pos.lng };
           });
         } else {
+          clientMap.setView([selectedCoords.lat, selectedCoords.lng], 15);
+          clientMarker.setLatLng([selectedCoords.lat, selectedCoords.lng]);
           clientMap.invalidateSize();
         }
       }, 200);
     };
 
-    window.closeCartModal = () => document.getElementById('cart-modal').classList.remove('open');
+    window.closeCartModal = () => {
+      const submitBtn = document.getElementById('btn-submit-order');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Terminar Pedido";
+      }
+      document.getElementById('cart-modal').classList.remove('open');
+    };
 
     window.locateUserGPS = () => {
       if (!navigator.geolocation) return alert("Tu navegador no soporta GPS");
@@ -768,31 +1095,36 @@
       }, () => alert("Activa el permiso de ubicación en tu celular."));
     };
 
-    // =========================================================================
-    // 5. ENVIAR PEDIDO A FIREBASE
-    // =========================================================================
     window.submitOrder = async (e) => {
       e.preventDefault();
       if (cart.length === 0) return alert("Agrega al menos un producto.");
 
       const submitBtn = document.getElementById('btn-submit-order');
       submitBtn.disabled = true;
-      submitBtn.textContent = "Enviando pedido...";
+      submitBtn.textContent = "Registrando pedido...";
 
       const folio = Math.floor(100 + Math.random() * 900);
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
       const hasPizza = cart.some(i => i.type === 'pizza');
 
+      const customerName = document.getElementById('cust-name').value.trim();
+      const customerEmail = document.getElementById('cust-email').value.trim();
+      const customerPhone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const notes = document.getElementById('cust-notes').value.trim();
+
       const newOrder = {
-        folio: folio,
-        customerName: document.getElementById('cust-name').value.trim(),
-        customerPhone: document.getElementById('cust-phone').value.trim(),
+        folio,
+        customerName,
+        customerEmail,
+        customerPhone,
+        address,
+        notes,
         paymentStatus: document.getElementById('cust-payment').value,
-        address: document.getElementById('cust-address').value.trim(),
         coords: selectedCoords,
         items: cart,
-        total: total,
+        total,
         status: hasPizza ? 'pendiente_cocina' : 'en_embarque',
         isDelayed: false,
         createdAt: serverTimestamp(),
@@ -804,33 +1136,41 @@
         }
       };
 
-      try {
-        const docRef = await addDoc(ordersRef, newOrder);
-        localStorage.setItem('my_active_order_id', docRef.id);
+      const finishSuccess = (orderId) => {
+        saveCustomerProfile({
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
+          address,
+          coords: selectedCoords
+        });
+        if (orderId) localStorage.setItem('my_active_order_id', orderId);
         cart = [];
         updateCartUI();
-        document.getElementById('checkout-form').reset();
         closeCartModal();
         switchView('pedido');
+      };
+
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 8000)
+        );
+        const docRef = await Promise.race([addDoc(ordersRef, newOrder), timeoutPromise]);
+        finishSuccess(docRef.id);
       } catch (err) {
         console.error(err);
-        alert("Error al enviar pedido a Firebase. Verifica que Firestore esté creado y en modo de prueba.");
+        alert("No se pudo confirmar la conexión en este momento. Revisa tu internet o las reglas de Firestore y vuelve a intentar.");
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Confirmar y Enviar Pedido";
+        submitBtn.textContent = "Terminar Pedido";
       }
     };
 
-    // =========================================================================
-    // 6. ESCUCHA EN TIEMPO REAL (CLIENTE Y PANEL ADMIN)
-    // =========================================================================
     const q = query(ordersRef, orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
       allOrders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderClientTracker();
       renderAdminStation();
-    }, (err) => {
-      console.error("Error en listener de Firestore:", err);
     });
 
     function renderClientTracker(customOrder = null) {
@@ -851,17 +1191,16 @@
       container.innerHTML = `
         <div class="tracker-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:18px; font-weight:800; color:var(--accent);">Pedido #${order.folio}</span>
+            <span style="font-size:17px; font-weight:800; color:var(--accent);">Pedido #${order.folio}</span>
             <span style="font-size:12px; color:var(--text-muted);">${order.createdTime || ''}</span>
           </div>
           <p style="font-size:13px; margin-top:4px;">Cliente: <strong>${order.customerName}</strong> • Total: <strong>$${order.total}</strong></p>
-          
+          ${order.customerEmail ? `<p style="font-size:12px; color:var(--text-muted); margin-top:2px;">${order.customerEmail} • ${order.customerPhone || ''}</p>` : ''}
           ${order.isDelayed ? `
-            <div style="background:rgba(239,68,68,0.2); border:1px solid var(--danger); color:#fca5a5; padding:10px; border-radius:10px; margin-top:12px; font-size:12px; font-weight:700;">
-              ⚠️ Tu pedido presenta un ligero retardo por alta demanda. ¡Ya vamos en camino!
+            <div style="background:rgba(239,68,68,0.16); border:1px solid var(--danger); color:#fca5a5; padding:10px; border-radius:10px; margin-top:12px; font-size:12px; font-weight:700;">
+              Retardo reportado por alta demanda. Tu orden sigue en proceso.
             </div>
           ` : ''}
-
           <div class="status-steps">
             <div class="step ${stepNum >= 1 ? 'done' : ''}">
               <div class="step-dot"><i class="ph-bold ph-check"></i></div>
@@ -869,19 +1208,19 @@
             </div>
             <div class="step ${stepNum > 2 ? 'done' : (stepNum === 2 ? 'current' : '')}">
               <div class="step-dot"><i class="ph-fill ph-fire"></i></div>
-              <div><strong>Cocinando</strong><div style="font-size:11px; color:var(--text-muted);">Tu pizza está en el horno artesanal</div></div>
+              <div><strong>Cocinando</strong><div style="font-size:11px; color:var(--text-muted);">Preparación en horno pizzero</div></div>
             </div>
             <div class="step ${stepNum > 3 ? 'done' : (stepNum === 3 ? 'current' : '')}">
               <div class="step-dot"><i class="ph-fill ph-package"></i></div>
-              <div><strong>Empacando (Embarque)</strong><div style="font-size:11px; color:var(--text-muted);">Verificando bebidas, postres y caja</div></div>
+              <div><strong>Embarque</strong><div style="font-size:11px; color:var(--text-muted);">Revisión de pizzas y complementos</div></div>
             </div>
             <div class="step ${stepNum > 4 ? 'done' : (stepNum === 4 ? 'current' : '')}">
               <div class="step-dot"><i class="ph-fill ph-moped"></i></div>
-              <div><strong>En Reparto</strong><div style="font-size:11px; color:var(--text-muted);">El repartidor va rumbo a tu domicilio</div></div>
+              <div><strong>En Reparto</strong><div style="font-size:11px; color:var(--text-muted);">En camino al domicilio</div></div>
             </div>
             <div class="step ${stepNum === 5 ? 'done' : ''}">
               <div class="step-dot"><i class="ph-fill ph-house"></i></div>
-              <div><strong>Entregado</strong><div style="font-size:11px; color:var(--text-muted);">¡Buen provecho!</div></div>
+              <div><strong>Entregado</strong><div style="font-size:11px; color:var(--text-muted);">Pedido completado</div></div>
             </div>
           </div>
         </div>
@@ -889,46 +1228,75 @@
     }
 
     window.searchOrderByQuery = () => {
-      const val = document.getElementById('search-order-input').value.replace('#', '').trim();
+      const val = document.getElementById('search-order-input').value.replace('#', '').trim().toLowerCase();
       if (!val) return;
-      const found = allOrders.find(o => String(o.folio) === val || o.customerPhone.includes(val));
+      const found = allOrders.find(o =>
+        String(o.folio).toLowerCase() === val ||
+        String(o.customerPhone || '').toLowerCase().includes(val) ||
+        String(o.customerEmail || '').toLowerCase() === val
+      );
       if (found) {
         localStorage.setItem('my_active_order_id', found.id);
         renderClientTracker(found);
       } else {
-        alert("No se encontró ningún pedido con ese folio o teléfono.");
+        alert("No se encontró ningún pedido con ese folio, correo o teléfono.");
       }
     };
 
-    // =========================================================================
-    // 7. BOTÓN SECRETO (6 CLICS AL LOGO) Y ESTACIONES ADMIN
-    // =========================================================================
     let logoClicks = 0;
     let logoTimer;
-    const logoTrigger = document.getElementById('secret-logo-trigger');
-    if (logoTrigger) {
-      logoTrigger.addEventListener('click', () => {
-        logoClicks++;
-        clearTimeout(logoTimer);
-        logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
-        if (logoClicks >= 6) {
-          logoClicks = 0;
-          document.getElementById('admin-pass-input').value = '';
-          document.getElementById('admin-login-modal').classList.add('open');
-          setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
-        }
-      });
-    }
+    document.getElementById('secret-logo-trigger').addEventListener('click', () => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
+      if (logoClicks >= 6) {
+        logoClicks = 0;
+        document.getElementById('admin-pass-input').value = '';
+        document.getElementById('admin-login-modal').classList.add('open');
+        setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+      }
+    });
 
     window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.remove('open');
 
+    function applyAdminAccess(cfg) {
+      closeAdminLogin();
+      document.getElementById('admin-pass-input').value = '';
+      adminMode = cfg.mode;
+
+      const tabsBar = document.getElementById('station-tabs-bar');
+      const stationSub = document.getElementById('station-sub-toggle');
+      const ownerSub = document.getElementById('owner-sub-toggle');
+      const titleEl = document.getElementById('admin-panel-title');
+
+      if (cfg.mode === 'owner') {
+        titleEl.innerHTML = `Reporte y <span>Menú</span>`;
+        tabsBar.style.display = 'none';
+        stationSub.style.display = 'none';
+        ownerSub.style.display = 'flex';
+        ownerSubTab = 'reporte';
+        document.getElementById('btn-owner-reporte').classList.add('active');
+        document.getElementById('btn-owner-menu').classList.remove('active');
+      } else {
+        currentRole = cfg.role;
+        titleEl.innerHTML = `Panel <span>${cfg.label}</span>`;
+        tabsBar.style.display = 'grid';
+        stationSub.style.display = 'flex';
+        ownerSub.style.display = 'none';
+        document.querySelectorAll('.admin-tab').forEach(btn => {
+          btn.classList.toggle('active', btn.id === `tab-${cfg.role}`);
+        });
+      }
+
+      switchView('admin');
+      renderAdminStation();
+    }
+
     window.verifyAdminPass = () => {
       const pass = String(document.getElementById('admin-pass-input').value).trim();
-      if (pass === String(ADMIN_PASSWORD)) {
-        closeAdminLogin();
-        document.getElementById('admin-pass-input').value = '';
-        switchView('admin');
-        renderAdminStation();
+      const matched = ROLE_PASSWORDS[pass] || ROLE_PASSWORDS[pass.toLowerCase()];
+      if (matched) {
+        applyAdminAccess(matched);
       } else {
         alert("Contraseña incorrecta");
       }
@@ -950,35 +1318,153 @@
       renderAdminStation();
     };
 
+    window.setOwnerSubTab = (sub) => {
+      ownerSubTab = sub;
+      document.getElementById('btn-owner-reporte').classList.toggle('active', sub === 'reporte');
+      document.getElementById('btn-owner-menu').classList.toggle('active', sub === 'menu');
+      renderAdminStation();
+    };
+
+    window.saveProductEdit = async (prodId) => {
+      const base = products.find(p => p.id === prodId);
+      if (!base) return;
+      const name = document.getElementById(`edit-name-${prodId}`).value.trim() || base.name;
+      const price = Number(document.getElementById(`edit-price-${prodId}`).value) || base.price;
+      const desc = document.getElementById(`edit-desc-${prodId}`).value.trim();
+      const img = document.getElementById(`edit-img-${prodId}`).value.trim() || base.img;
+      const comingSoon = document.getElementById(`edit-soon-${prodId}`).checked;
+
+      try {
+        await setDoc(doc(db, "productos", prodId), {
+          ...base,
+          name,
+          price,
+          desc,
+          img,
+          comingSoon
+        }, { merge: true });
+        alert(`"${name}" actualizado.`);
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo guardar el producto en Firebase.");
+      }
+    };
+
     window.updateOrderStage = async (orderId, nextStatus, stationKey, logText) => {
       const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-      const ref = doc(db, "pedidos", orderId);
-      await updateDoc(ref, {
+      await updateDoc(doc(db, "pedidos", orderId), {
         status: nextStatus,
         [`history.${stationKey}`]: { action: logText, time: nowStr, completed: true }
       });
     };
 
     window.toggleDelay = async (orderId, currentDelay) => {
-      const ref = doc(db, "pedidos", orderId);
-      await updateDoc(ref, { isDelayed: !currentDelay });
+      await updateDoc(doc(db, "pedidos", orderId), { isDelayed: !currentDelay });
     };
 
     function renderAdminStation() {
       const container = document.getElementById('admin-orders-list');
       if (!document.getElementById('view-admin').classList.contains('active')) return;
 
+      if (adminMode === 'owner') {
+        if (ownerSubTab === 'menu') {
+          container.innerHTML = products.map(p => `
+            <div class="edit-product-card">
+              <div class="ticket-header">
+                <span class="ticket-id">${p.id}</span>
+                <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gold); cursor:pointer;">
+                  <input type="checkbox" id="edit-soon-${p.id}" ${p.comingSoon ? 'checked' : ''}>
+                  Próximamente
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="edit-name-${p.id}" class="form-control" value="${p.name.replace(/"/g, '&quot;')}">
+              </div>
+              <div class="form-group">
+                <label>Precio ($ MXN)</label>
+                <input type="number" id="edit-price-${p.id}" class="form-control" value="${p.price}">
+              </div>
+              <div class="form-group">
+                <label>Descripción</label>
+                <input type="text" id="edit-desc-${p.id}" class="form-control" value="${(p.desc || '').replace(/"/g, '&quot;')}">
+              </div>
+              <div class="form-group">
+                <label>URL o ruta de imagen</label>
+                <input type="text" id="edit-img-${p.id}" class="form-control" value="${(p.img || '').replace(/"/g, '&quot;')}">
+              </div>
+              <button type="button" class="btn-action btn-next" onclick="saveProductEdit('${p.id}')">Guardar Cambios del Producto</button>
+            </div>
+          `).join('');
+          return;
+        }
+
+        const totalSales = allOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+        const deliveredOrders = allOrders.filter(o => o.status === 'entregado').length;
+        const delayedOrdersList = allOrders.filter(o => o.isDelayed);
+
+        container.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-label">Total vendido</div>
+              <div class="stat-value">$${totalSales}</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Pedidos registrados</div>
+              <div class="stat-value">${allOrders.length}</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Entregados</div>
+              <div class="stat-value" style="color:var(--success);">${deliveredOrders}</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Con retardo</div>
+              <div class="stat-value" style="color:var(--danger);">${delayedOrdersList.length}</div>
+            </div>
+          </div>
+
+          <h4 style="font-size:14px; font-weight:800; margin-bottom:10px;">Pedidos con retardo</h4>
+          ${delayedOrdersList.length === 0
+            ? `<p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">No hay pedidos con retardo reportado.</p>`
+            : delayedOrdersList.map(o => `
+              <div class="order-ticket" style="border-left-color:var(--danger);">
+                <div class="ticket-header">
+                  <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
+                  <span class="ticket-time">${o.createdTime || ''}</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">Total: $${o.total} • Estado actual: ${o.status}</p>
+              </div>
+            `).join('')
+          }
+
+          <h4 style="font-size:14px; font-weight:800; margin-bottom:10px;">Detalle de ventas</h4>
+          ${allOrders.length === 0
+            ? `<p style="font-size:12px; color:var(--text-muted);">Aún no hay pedidos registrados.</p>`
+            : allOrders.map(o => `
+              <div class="order-ticket">
+                <div class="ticket-header">
+                  <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
+                  <span class="ticket-time">$${o.total} • ${o.createdTime || ''}</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">
+                  ${o.customerEmail || ''} ${o.customerPhone ? `• ${o.customerPhone}` : ''} • ${o.isDelayed ? 'CON RETARDO' : o.status}
+                </p>
+              </div>
+            `).join('')
+          }
+        `;
+        return;
+      }
+
       let filtered = [];
 
       if (currentRole === 'cocinero') {
-        if (currentSubTab === 'activos') {
-          filtered = allOrders.filter(o => o.status === 'pendiente_cocina' || o.status === 'cocinando');
-        } else {
-          filtered = allOrders.filter(o => o.history && o.history.cocinero && o.history.cocinero.completed);
-        }
+        filtered = currentSubTab === 'activos'
+          ? allOrders.filter(o => o.status === 'pendiente_cocina' || o.status === 'cocinando')
+          : allOrders.filter(o => o.history && o.history.cocinero && o.history.cocinero.completed);
 
-        if (filtered.length === 0) {
-          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay pizzas ${currentSubTab === 'activos' ? 'pendientes' : 'en el historial'}.</p>`;
+        if (!filtered.length) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">Sin registros en esta vista.</p>`;
           return;
         }
 
@@ -990,29 +1476,27 @@
                 <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
                 <span class="ticket-time">${o.createdTime || ''}</span>
               </div>
+              ${o.notes ? `<p style="font-size:12px; color:var(--gold); margin-bottom:6px;">Nota: ${o.notes}</p>` : ''}
               <ul class="ticket-items">
-                ${pizzasOnly.map(p => `<li><span><strong>${p.qty}x</strong> ${p.name}</span><span>Horno</span></li>`).join('')}
+                ${pizzasOnly.map(p => `<li><span><strong>${p.qty}x</strong> ${p.name}</span><span>Horno pizzero</span></li>`).join('')}
               </ul>
-              ${currentSubTab === 'activos' ? `
-                ${o.status === 'pendiente_cocina' 
-                  ? `<button type="button" class="btn-action btn-accept" onclick="acceptKitchen('${o.id}')"><i class="ph-bold ph-check"></i> Aceptar Pedido</button>`
-                  : `<button type="button" class="btn-action btn-next" onclick="finishKitchen('${o.id}')"><i class="ph-bold ph-fire"></i> Entregado a Embarque</button>`
-                }
-              ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.cocinero.action} (${o.history.cocinero.time})</div>`}
+              ${currentSubTab === 'activos' ? (
+                o.status === 'pendiente_cocina'
+                  ? `<button type="button" class="btn-action btn-accept" onclick="acceptKitchen('${o.id}')">Aceptar Pedido</button>`
+                  : `<button type="button" class="btn-action btn-next" onclick="finishKitchen('${o.id}')">Entregado a Embarque</button>`
+              ) : `<div style="font-size:12px; color:var(--success);">${o.history.cocinero.action} (${o.history.cocinero.time})</div>`}
             </div>
           `;
         }).join('');
       }
 
       if (currentRole === 'embarque') {
-        if (currentSubTab === 'activos') {
-          filtered = allOrders.filter(o => o.status === 'en_embarque');
-        } else {
-          filtered = allOrders.filter(o => o.history && o.history.embarque);
-        }
+        filtered = currentSubTab === 'activos'
+          ? allOrders.filter(o => o.status === 'en_embarque')
+          : allOrders.filter(o => o.history && o.history.embarque);
 
-        if (filtered.length === 0) {
-          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay pedidos en embarque.</p>`;
+        if (!filtered.length) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">Sin registros en esta vista.</p>`;
           return;
         }
 
@@ -1025,31 +1509,23 @@
               </span>
             </div>
             <ul class="ticket-items">
-              ${o.items.map(i => `
-                <li>
-                  <span><strong>${i.qty}x</strong> ${i.name}</span>
-                  <span style="color:var(--text-muted); font-size:11px;">${i.type === 'pizza' ? '🍕 Lista' : '🥤 Complemento'}</span>
-                </li>
-              `).join('')}
+              ${o.items.map(i => `<li><span><strong>${i.qty}x</strong> ${i.name}</span><span style="color:var(--text-muted); font-size:11px;">${i.type === 'pizza' ? 'Pizza' : 'Complemento'}</span></li>`).join('')}
             </ul>
-            ${currentSubTab === 'activos' ? `
-              <button type="button" class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'en_reparto', 'embarque', 'Pedido completo enviado a reparto')">
-                <i class="ph-bold ph-package"></i> Pedido Completo ➔ Enviar a Repartidor
-              </button>
-            ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.embarque.action} (${o.history.embarque.time})</div>`}
+            ${currentSubTab === 'activos'
+              ? `<button type="button" class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'en_reparto', 'embarque', 'Pedido completo enviado a reparto')">Pedido Completo ➔ Repartidor</button>`
+              : `<div style="font-size:12px; color:var(--success);">${o.history.embarque.action} (${o.history.embarque.time})</div>`
+            }
           </div>
         `).join('');
       }
 
       if (currentRole === 'repartidor') {
-        if (currentSubTab === 'activos') {
-          filtered = allOrders.filter(o => o.status === 'en_reparto');
-        } else {
-          filtered = allOrders.filter(o => o.history && o.history.repartidor);
-        }
+        filtered = currentSubTab === 'activos'
+          ? allOrders.filter(o => o.status === 'en_reparto')
+          : allOrders.filter(o => o.history && o.history.repartidor);
 
-        if (filtered.length === 0) {
-          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay entregas en ruta.</p>`;
+        if (!filtered.length) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">Sin registros en esta vista.</p>`;
           return;
         }
 
@@ -1060,28 +1536,23 @@
               <div class="ticket-header">
                 <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
                 <span class="pill-status ${o.paymentStatus === 'pagado' ? 'paid-yes' : 'paid-no'}">
-                  ${o.paymentStatus === 'pagado' ? 'YA PAGADO' : `COBRAR: $${o.total}`}
+                  ${o.paymentStatus === 'pagado' ? 'PAGADO' : `COBRAR $${o.total}`}
                 </span>
               </div>
-              <p style="font-size:12px; margin-bottom:4px;"><i class="ph-fill ph-phone"></i> Tel: <a href="tel:${o.customerPhone}" style="color:var(--accent);">${o.customerPhone}</a></p>
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;"><i class="ph-fill ph-map-pin"></i> ${o.address}</p>
-              
+              <p style="font-size:12px; margin-bottom:4px;">Tel: <a href="tel:${o.customerPhone}" style="color:var(--accent);">${o.customerPhone}</a>${o.customerEmail ? ` • ${o.customerEmail}` : ''}</p>
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">${o.address}</p>
+              ${o.notes ? `<p style="font-size:12px; color:var(--gold); margin-bottom:8px;">Nota: ${o.notes}</p>` : ''}
               <ul class="ticket-items">
                 ${o.items.map(i => `<li><span>${i.qty}x ${i.name}</span><span>$${i.price * i.qty}</span></li>`).join('')}
               </ul>
-
               ${currentSubTab === 'activos' ? `
                 <div id="driver-map-${o.id}" class="driver-map"></div>
-                <a href="${mapsUrl}" target="_blank" class="btn-action btn-maps">
-                  <i class="ph-bold ph-navigation-arrow"></i> Abrir Ruta en Google Maps
-                </a>
+                <a href="${mapsUrl}" target="_blank" class="btn-action btn-maps">Abrir Ruta en Google Maps</a>
                 <button type="button" class="btn-action btn-delay" onclick="toggleDelay('${o.id}', ${o.isDelayed})">
-                  <i class="ph-bold ph-warning"></i> ${o.isDelayed ? 'Quitar aviso de retardo' : 'Reportar Retardo al Cliente'}
+                  ${o.isDelayed ? 'Quitar aviso de retardo' : 'Reportar Retardo'}
                 </button>
-                <button type="button" class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'entregado', 'repartidor', 'Entregado al cliente')">
-                  <i class="ph-bold ph-check-circle"></i> Marcar como Entregado
-                </button>
-              ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.repartidor.action} (${o.history.repartidor.time})</div>`}
+                <button type="button" class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'entregado', 'repartidor', 'Entregado al cliente')">Marcar como Entregado</button>
+              ` : `<div style="font-size:12px; color:var(--success);">${o.history.repartidor.action} (${o.history.repartidor.time})</div>`}
             </div>
           `;
         }).join('');
@@ -1124,9 +1595,6 @@
       });
     };
 
-    // =========================================================================
-    // 8. NAVEGACIÓN ENTRE VISTAS
-    // =========================================================================
     window.switchView = (viewName) => {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
