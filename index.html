@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pizza Artesanal | Horno de Piedra</title>
+  
+  <!-- Fuentes estilo artesanal y limpio -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Phosphor -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Leaflet CSS & JS para el minimapa gratuito del cliente y repartidor -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0e0a08;
+      --bg-card: #18120e;
+      --bg-card-hover: #221914;
+      --accent: #f3701e;
+      --accent-glow: rgba(243, 112, 30, 0.35);
+      --gold: #f59e0b;
+      --text-main: #f8f5f2;
+      --text-muted: #a89f99;
+      --border: #2e231c;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding-bottom: 135px;
+      overflow-x: hidden;
+    }
+
+    .script-font {
+      font-family: 'Caveat', cursive;
+      letter-spacing: 0.5px;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(14, 10, 8, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent), #c2410c);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 4px 15px var(--accent-glow);
+      transition: transform 0.1s;
+    }
+    .brand:active .brand-icon { transform: scale(0.92); }
+
+    .brand-text h1 { font-size: 16px; font-weight: 800; line-height: 1.1; text-transform: uppercase; }
+    .brand-text span { font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .cart-top-btn {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+    }
+    .badge {
+      position: absolute; top: -4px; right: -4px;
+      background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 800;
+      width: 19px; height: 19px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* HERO BANNER */
+    .hero {
+      position: relative;
+      padding: 28px 20px;
+      background: radial-gradient(circle at top right, rgba(243, 112, 30, 0.25), transparent 65%),
+                  linear-gradient(to bottom, rgba(14,10,8,0.4), var(--bg-dark)),
+                  url('https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80') center/cover;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(243, 112, 30, 0.18);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; margin-bottom: 10px;
+    }
+    .hero h2 { font-size: 28px; font-weight: 800; line-height: 1.15; margin-bottom: 6px; }
+    .hero h2 span { color: var(--accent); font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; }
+    .hero p { font-size: 13px; color: var(--text-muted); max-width: 310px; margin-bottom: 18px; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      color: #fff; border: none; padding: 12px 20px;
+      border-radius: 30px; font-weight: 700; font-size: 14px;
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer; box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    /* FEATURES STRIP */
+    .features-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; padding: 14px 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .feat-item i { font-size: 22px; color: var(--accent); margin-bottom: 4px; }
+    .feat-item div { font-size: 11px; font-weight: 700; }
+    .feat-item span { font-size: 10px; color: var(--text-muted); display: block; }
+
+    /* SECTION TITLES & TABS */
+    .section-container { padding: 18px 16px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .section-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .section-title span { color: var(--accent); font-family: 'Caveat', cursive; font-size: 30px; }
+
+    .cat-pills {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .cat-pills::-webkit-scrollbar { display: none; }
+    .pill {
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); padding: 8px 16px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;
+    }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* PRODUCT GRID */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .promo-ribbon {
+      position: absolute; top: 8px; left: 8px;
+      background: var(--danger); color: #fff;
+      font-size: 10px; font-weight: 800; padding: 3px 8px;
+      border-radius: 8px; text-transform: uppercase;
+    }
+    .product-img {
+      width: 100%; height: 120px; object-fit: cover;
+      background: #221914;
+    }
+    .product-body { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+    .product-desc { font-size: 11px; color: var(--text-muted); line-height: 1.35; margin-bottom: 12px; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; }
+    .product-price { font-size: 18px; font-weight: 800; color: var(--accent); }
+    .add-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent); color: #fff; border: none;
+      font-size: 18px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 10px var(--accent-glow);
+    }
+    .add-btn:active { transform: scale(0.9); }
+
+    /* FLOATING CART BAR */
+    .floating-cart {
+      position: fixed;
+      bottom: 72px;
+      left: 14px; right: 14px;
+      background: linear-gradient(135deg, var(--accent), #d95308);
+      color: #fff;
+      padding: 13px 18px;
+      border-radius: 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+      z-index: 45;
+      cursor: pointer;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: #130e0b;
+      border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      z-index: 50;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; color: var(--text-muted); text-decoration: none;
+      font-size: 11px; font-weight: 600; background: none; border: none; cursor: pointer;
+      position: relative;
+    }
+    .nav-item i { font-size: 22px; }
+    .nav-item.active { color: var(--accent); }
+    .nav-item.active::after {
+      content: ''; position: absolute; bottom: 0; width: 32px; height: 3px;
+      background: var(--accent); border-radius: 3px 3px 0 0;
+    }
+
+    /* VIEWS */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* TRACKER (MI PEDIDO) */
+    .tracker-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px; margin-bottom: 16px;
+    }
+    .status-steps { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; position: relative; }
+    .step { display: flex; align-items: flex-start; gap: 12px; opacity: 0.4; }
+    .step.done, .step.current { opacity: 1; }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .step.done .step-dot { background: var(--success); color: #fff; }
+    .step.current .step-dot { background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--accent); }
+    .step.delay .step-dot { background: var(--danger); color: #fff; }
+
+    /* MODALS */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+      z-index: 100; display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--bg-card); width: 100%; max-width: 520px;
+      max-height: 92vh; overflow-y: auto;
+      border-radius: 22px 22px 0 0; border-top: 1px solid var(--border);
+      padding: 20px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted); }
+    .form-control {
+      width: 100%; padding: 11px 14px; border-radius: 12px;
+      background: var(--bg-dark); border: 1px solid var(--border);
+      color: var(--text-main); font-family: inherit; font-size: 14px;
+    }
+    #client-map, .driver-map { height: 180px; width: 100%; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px; z-index: 1; }
+
+    /* ADMIN PANEL */
+    .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+    .admin-tab {
+      padding: 10px 6px; border-radius: 12px; background: var(--bg-card);
+      border: 1px solid var(--border); color: var(--text-muted);
+      font-size: 12px; font-weight: 700; text-align: center; cursor: pointer;
+    }
+    .admin-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sub-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+    .sub-btn {
+      flex: 1; padding: 8px; border-radius: 10px; background: var(--bg-dark);
+      border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .sub-btn.active { border-color: var(--gold); color: var(--gold); }
+
+    .order-ticket {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-left: 4px solid var(--accent); border-radius: 14px;
+      padding: 14px; margin-bottom: 12px;
+    }
+    .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .ticket-id { font-weight: 800; font-size: 15px; color: var(--accent); }
+    .ticket-time { font-size: 11px; color: var(--text-muted); }
+    .ticket-items { list-style: none; margin: 10px 0; padding: 8px; background: var(--bg-dark); border-radius: 10px; font-size: 13px; }
+    .ticket-items li { padding: 3px 0; display: flex; justify-content: space-between; }
+    .btn-action {
+      width: 100%; padding: 11px; border-radius: 10px; border: none;
+      font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-accept { background: var(--gold); color: #000; }
+    .btn-next { background: var(--success); color: #fff; }
+    .btn-maps { background: #2563eb; color: #fff; text-decoration: none; }
+    .btn-delay { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
+
+    .pill-status {
+      padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+    }
+    .paid-yes { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .paid-no { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER (Tocar 6 veces el logo abre el Admin secreto) -->
+  <header>
+    <div class="brand" id="secret-logo-trigger" title="Pizza Artesanal">
+      <div class="brand-icon"><i class="ph-fill ph-fire"></i></div>
+      <div class="brand-text">
+        <h1>Pizza Artesanal</h1>
+        <span>ZACATEPEC</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="cart-top-btn" onclick="openCartModal()">
+        <i class="ph ph-shopping-cart"></i>
+        <span class="badge" id="top-cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- VISTA 1: INICIO -->
+  <main id="view-inicio" class="view active">
+    <section class="hero">
+      <div class="hero-tag"><i class="ph-fill ph-map-pin"></i> Zacatepec, Morelos</div>
+      <h2>El verdadero sabor en cada <span>rebanada</span></h2>
+      <p>Masa fresca hecha en casa, ingredientes de calidad y el auténtico sabor de horno artesanal.</p>
+      <button class="btn-primary" onclick="switchView('menu')">
+        <i class="ph-fill ph-pizza"></i> Ver Menú Completo
+      </button>
+    </section>
+
+    <section class="features-strip">
+      <div class="feat-item">
+        <i class="ph-fill ph-fire"></i>
+        <div>Hecha en casa</div>
+        <span>Horno artesanal</span>
+      </div>
+      <div class="feat-item">
+        <i class="ph-fill ph-moped"></i>
+        <div>A domicilio</div>
+        <span>En Zacatepec</span>
+      </div>
+      <div class="feat-item">
+        <i class="ph-fill ph-shield-check"></i>
+        <div>Pedido seguro</div>
+        <span>Rastreo en vivo</span>
+      </div>
+    </section>
+
+    <section class="section-container">
+      <div class="section-header">
+        <h3 class="section-title">Promos y <span>Favoritas</span></h3>
+      </div>
+      <div class="products-grid" id="home-products"></div>
+    </section>
+  </main>
+
+  <!-- VISTA 2: MENÚ COMPLETO -->
+  <main id="view-menu" class="view">
+    <section class="section-container">
+      <div class="section-header">
+        <h3 class="section-title">Nuestro <span>Menú</span></h3>
+      </div>
+      <div class="cat-pills">
+        <button class="pill active" onclick="filterMenu('todos', this)">Todo</button>
+        <button class="pill" onclick="filterMenu('promocion', this)">🔥 Promoción $75</button>
+        <button class="pill" onclick="filterMenu('pizzas', this)">🍕 Pizzas</button>
+        <button class="pill" onclick="filterMenu('postres', this)">🍰 Postres</button>
+        <button class="pill" onclick="filterMenu('bebidas', this)">🥤 Bebidas</button>
+      </div>
+      <div class="products-grid" id="menu-products"></div>
+    </section>
+  </main>
+
+  <!-- VISTA 3: MI PEDIDO (SEGUIMIENTO EN TIEMPO REAL) -->
+  <main id="view-pedido" class="view">
+    <section class="section-container">
+      <div class="section-header">
+        <h3 class="section-title">Rastreo de <span>Mi Pedido</span></h3>
+      </div>
+
+      <div class="tracker-card">
+        <label style="font-size:12px; color:var(--text-muted);">¿Buscas un pedido anterior? Ingresa tu folio o teléfono:</label>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <input type="text" id="search-order-input" class="form-control" placeholder="Ej. #104 o 7341234567">
+          <button class="btn-primary" style="border-radius:12px; padding:0 16px;" onclick="searchOrderByQuery()">Buscar</button>
+        </div>
+      </div>
+
+      <div id="active-order-container">
+        <div class="tracker-card" style="text-align:center; padding:32px 16px;">
+          <i class="ph ph-pizza" style="font-size:44px; color:var(--text-muted); margin-bottom:10px;"></i>
+          <p style="font-size:14px; color:var(--text-muted);">Aún no tienes un pedido activo en este dispositivo.</p>
+          <button class="btn-primary" style="margin-top:14px;" onclick="switchView('menu')">Ordenar ahora</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- VISTA 4: PANEL ADMIN (3 ESTACIONES + HISTORIAL) -->
+  <main id="view-admin" class="view">
+    <section class="section-container">
+      <div class="section-header">
+        <h3 class="section-title">Panel <span>Operativo</span></h3>
+        <button onclick="logoutAdmin()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:8px; font-size:12px;">Salir</button>
+      </div>
+
+      <!-- 3 Roles -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="setAdminRole('cocinero', this)">👨‍🍳 Cocinero</button>
+        <button class="admin-tab" onclick="setAdminRole('embarque', this)">📦 Embarque</button>
+        <button class="admin-tab" onclick="setAdminRole('repartidor', this)">🛵 Repartidor</button>
+      </div>
+
+      <!-- Activos vs Historial de la estación -->
+      <div class="sub-toggle">
+        <button class="sub-btn active" id="btn-sub-activos" onclick="setAdminSubTab('activos')">Pendientes en turno</button>
+        <button class="sub-btn" id="btn-sub-historial" onclick="setAdminSubTab('historial')">Historial guardado</button>
+      </div>
+
+      <div id="admin-orders-list"></div>
+    </section>
+  </main>
+
+  <!-- BARRA FLOTANTE DEL CARRITO -->
+  <div class="floating-cart" id="floating-cart" onclick="openCartModal()">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span id="float-count" style="background:rgba(0,0,0,0.25); padding:4px 10px; border-radius:10px; font-weight:800;">0</span>
+      <span style="font-weight:700; font-size:14px;">Ver carrito y pedir</span>
+    </div>
+    <span id="float-total" style="font-weight:800; font-size:16px;">$0</span>
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-inicio" onclick="switchView('inicio')">
+      <i class="ph-fill ph-house"></i>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item" id="nav-menu" onclick="switchView('menu')">
+      <i class="ph-fill ph-book-open-text"></i>
+      <span>Menú</span>
+    </button>
+    <button class="nav-item" id="nav-pedido" onclick="switchView('pedido')">
+      <i class="ph-fill ph-moped"></i>
+      <span>Mi Pedido</span>
+    </button>
+    <a class="nav-item" href="https://wa.me/527340000000?text=Hola,%20tengo%20una%20duda%20con%20mi%20pedido" target="_blank">
+      <i class="ph-fill ph-whatsapp-logo" style="color:#25d366;"></i>
+      <span>WhatsApp</span>
+    </a>
+  </nav>
+
+  <!-- MODAL CARRITO Y CHECKOUT -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="modal-sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:18px; font-weight:800;">Tu Pedido</h3>
+        <button onclick="closeCartModal()" style="background:none; border:none; color:var(--text-muted); font-size:24px;">&times;</button>
+      </div>
+
+      <div id="cart-items-list" style="margin-bottom:16px;"></div>
+
+      <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:16px;">
+        <span>Total a pagar:</span>
+        <span id="modal-total" style="color:var(--accent);">$0</span>
+      </div>
+
+      <form id="checkout-form" onsubmit="submitOrder(event)">
+        <div class="form-group">
+          <label>Tu Nombre *</label>
+          <input type="text" id="cust-name" class="form-control" required placeholder="Ej. Carlos Mendoza">
+        </div>
+        <div class="form-group">
+          <label>Teléfono / WhatsApp *</label>
+          <input type="tel" id="cust-phone" class="form-control" required placeholder="10 dígitos">
+        </div>
+        <div class="form-group">
+          <label>Forma de Pago *</label>
+          <select id="cust-payment" class="form-control">
+            <option value="efectivo">Pago en efectivo al recibir (Cobrar)</option>
+            <option value="pagado">Ya pagado por transferencia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dirección o Referencias *</label>
+          <input type="text" id="cust-address" class="form-control" required placeholder="Calle, número, colonia, color de casa...">
+        </div>
+        <div class="form-group">
+          <label>Marca tu ubicación exacta en el mapa (Arrastra el pin):</label>
+          <button type="button" onclick="locateUserGPS()" style="background:var(--bg-dark); border:1px solid var(--accent); color:var(--accent); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:6px; cursor:pointer;">
+            <i class="ph-fill ph-crosshair"></i> Usar mi GPS actual
+          </button>
+          <div id="client-map"></div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px;">
+          Confirmar y Enviar Pedido
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONTRASEÑA ADMIN -->
+  <div class="modal-overlay" id="admin-login-modal">
+    <div class="modal-sheet" style="max-width:380px; border-radius:22px; margin:auto;">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Acceso Personal</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa la contraseña operativa para abrir las estaciones.</p>
+      <input type="password" id="admin-pass-input" class="form-control" placeholder="Contraseña (Ej. 1234)" style="margin-bottom:12px;">
+      <div style="display:flex; gap:8px;">
+        <button onclick="closeAdminLogin()" style="flex:1; padding:11px; border-radius:10px; background:var(--bg-dark); border:1px solid var(--border); color:var(--text-muted); font-weight:700;">Cancelar</button>
+        <button onclick="verifyAdminPass()" class="btn-primary" style="flex:1; justify-content:center; border-radius:10px;">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE SDK & LÓGICA DE LA APP -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // =========================================================================
+    // 1. PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE
+    // =========================================================================
+    
+const firebaseConfig = {
+  apiKey: "AIzaSyCyq31sHToTb16-bt_A2QIbw2ypJyXSz0s",
+  authDomain: "v17pizza.firebaseapp.com",
+  databaseURL: "https://v17pizza-default-rtdb.firebaseio.com",
+  projectId: "v17pizza",
+  storageBucket: "v17pizza.firebasestorage.app",
+  messagingSenderId: "835067642663",
+  appId: "1:835067642663:web:ddc7985a044ef92ec91f02",
+  measurementId: "G-DWMF4D02T0"
+};
+
+
+
+    // Contraseña del Panel Admin (Cocinero / Embarque / Repartidor)
+    const ADMIN_PASSWORD = "1234";
+
+
+
+    // =========================================================================
+    // 2. CATÁLOGO DE PRODUCTOS (Incluye Promo $75, Pizzas, Postres y Bebidas)
+    // =========================================================================
+    const PRODUCTS = [
+      {
+        id: 'promo-75',
+        name: 'Pizza Promoción $75',
+        category: 'promocion',
+        type: 'pizza', // Va al cocinero
+        price: 75,
+        promo: '¡OFERTA!',
+        desc: 'Pizza artesanal individual/mediana de pepperoni o queso, recién salida del horno.',
+        img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=500&q=80',
+        featured: true
+      },
+      {
+        id: 'pizza-pep',
+        name: 'Pepperoni Artesanal',
+        category: 'pizzas',
+        type: 'pizza',
+        price: 99,
+        desc: 'Salsa de tomate casera, queso mozzarella fundido y pepperoni dorado.',
+        img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=500&q=80',
+        featured: true
+      },
+      {
+        id: 'pizza-haw',
+        name: 'Hawaiana',
+        category: 'pizzas',
+        type: 'pizza',
+        price: 105,
+        desc: 'Jamón horneado, piña dulce caramelizada y queso mozzarella.',
+        img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80',
+        featured: true
+      },
+      {
+        id: 'pizza-mex',
+        name: 'Mexicana',
+        category: 'pizzas',
+        type: 'pizza',
+        price: 109,
+        desc: 'Chorizo artesanal, rajas de jalapeño, cebolla morada y queso.',
+        img: 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=500&q=80',
+        featured: true
+      },
+      {
+        id: 'postre-roles',
+        name: 'Roles de Canela',
+        category: 'postres',
+        type: 'complemento', // Va directo a embarque
+        price: 45,
+        desc: 'Suaves roles glaseados horneados al día.',
+        img: 'https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=500&q=80',
+        featured: false
+      },
+      {
+        id: 'postre-japones',
+        name: 'Pastel Japonés',
+        category: 'postres',
+        type: 'complemento',
+        price: 55,
+        desc: 'Esponjoso cheesecake estilo japonés.',
+        img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=500&q=80',
+        featured: false
+      },
+      {
+        id: 'bebida-refresco',
+        name: 'Refresco 600ml',
+        category: 'bebidas',
+        type: 'complemento',
+        price: 25,
+        desc: 'Coca-Cola, Sprite o Mundet bien frío.',
+        img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80',
+        featured: false
+      }
+    ];
+
+    // =========================================================================
+    // 3. ESTADO GLOBAL Y RENDER DE PRODUCTOS
+    // =========================================================================
+    let cart = [];
+    let allOrders = [];
+    let currentRole = 'cocinero';
+    let currentSubTab = 'activos';
+    let selectedCoords = { lat: 18.6544, lng: -99.1906 }; // Centro Zacatepec por defecto
+    let clientMap, clientMarker;
+
+    function renderProductCard(p) {
+      return `
+        <div class="product-card">
+          ${p.promo ? `<span class="promo-ribbon">${p.promo}</span>` : ''}
+          <img src="${p.img}" alt="${p.name}" class="product-img" loading="lazy">
+          <div class="product-body">
+            <div>
+              <div class="product-title">${p.name}</div>
+              <div class="product-desc">${p.desc}</div>
+            </div>
+            <div class="product-footer">
+              <span class="product-price">$${p.price}</span>
+              <button class="add-btn" onclick="addToCart('${p.id}')">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('home-products').innerHTML = PRODUCTS.filter(p => p.featured).map(renderProductCard).join('');
+    document.getElementById('menu-products').innerHTML = PRODUCTS.map(renderProductCard).join('');
+
+    window.filterMenu = (cat, btn) => {
+      document.querySelectorAll('.pill').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = cat === 'todos' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
+      document.getElementById('menu-products').innerHTML = filtered.map(renderProductCard).join('');
+    };
+
+    // =========================================================================
+    // 4. CARRITO DE COMPRAS Y MAPA DE CLIENTE
+    // =========================================================================
+    window.addToCart = (id) => {
+      const prod = PRODUCTS.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ ...prod, qty: 1 });
+      updateCartUI();
+    };
+
+    window.changeQty = (id, delta) => {
+      const idx = cart.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      cart[idx].qty += delta;
+      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      updateCartUI();
+      renderCartModalItems();
+    };
+
+    function updateCartUI() {
+      const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+      const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+      document.getElementById('top-cart-count').textContent = totalQty;
+      const floatBar = document.getElementById('floating-cart');
+      if (totalQty > 0) {
+        floatBar.style.display = 'flex';
+        document.getElementById('float-count').textContent = totalQty;
+        document.getElementById('float-total').textContent = `$${totalMoney}`;
+      } else {
+        floatBar.style.display = 'none';
+      }
+    }
+
+    function renderCartModalItems() {
+      const container = document.getElementById('cart-items-list');
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted); font-size:13px;">Tu carrito está vacío.</p>';
+        document.getElementById('modal-total').textContent = '$0';
+        return;
+      }
+      container.innerHTML = cart.map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-weight:700; font-size:14px;">${item.name}</div>
+            <div style="font-size:12px; color:var(--accent);">$${item.price * item.qty}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button type="button" onclick="changeQty('${item.id}', -1)" style="width:26px; height:26px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border); color:#fff;">-</button>
+            <span style="font-weight:700;">${item.qty}</span>
+            <button type="button" onclick="changeQty('${item.id}', 1)" style="width:26px; height:26px; border-radius:50%; background:var(--accent); border:none; color:#fff;">+</button>
+          </div>
+        </div>
+      `).join('');
+      const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      document.getElementById('modal-total').textContent = `$${totalMoney}`;
+    }
+
+    window.openCartModal = () => {
+      renderCartModalItems();
+      document.getElementById('cart-modal').classList.add('open');
+      setTimeout(() => {
+        if (!clientMap) {
+          clientMap = L.map('client-map').setView([selectedCoords.lat, selectedCoords.lng], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(clientMap);
+          clientMarker = L.marker([selectedCoords.lat, selectedCoords.lng], { draggable: true }).addTo(clientMap);
+          clientMarker.on('dragend', () => {
+            const pos = clientMarker.getLatLng();
+            selectedCoords = { lat: pos.lat, lng: pos.lng };
+          });
+        } else {
+          clientMap.invalidateSize();
+        }
+      }, 200);
+    };
+
+    window.closeCartModal = () => document.getElementById('cart-modal').classList.remove('open');
+
+    window.locateUserGPS = () => {
+      if (!navigator.geolocation) return alert("Tu navegador no soporta GPS");
+      navigator.geolocation.getCurrentPosition(pos => {
+        selectedCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        clientMap.setView([selectedCoords.lat, selectedCoords.lng], 17);
+        clientMarker.setLatLng([selectedCoords.lat, selectedCoords.lng]);
+      }, () => alert("Activa el permiso de ubicación en tu celular."));
+    };
+
+    // =========================================================================
+    // 5. ENVIAR PEDIDO A FIREBASE
+    // =========================================================================
+    window.submitOrder = async (e) => {
+      e.preventDefault();
+      if (cart.length === 0) return alert("Agrega al menos un producto.");
+
+      const folio = Math.floor(100 + Math.random() * 900);
+      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+      // Si el pedido lleva pizzas va a 'pendiente_cocina', si solo lleva refrescos/postres pasa directo a 'en_embarque'
+      const hasPizza = cart.some(i => i.type === 'pizza');
+
+      const newOrder = {
+        folio: folio,
+        customerName: document.getElementById('cust-name').value.trim(),
+        customerPhone: document.getElementById('cust-phone').value.trim(),
+        paymentStatus: document.getElementById('cust-payment').value, // 'efectivo' o 'pagado'
+        address: document.getElementById('cust-address').value.trim(),
+        coords: selectedCoords,
+        items: cart,
+        total: total,
+        status: hasPizza ? 'pendiente_cocina' : 'en_embarque',
+        isDelayed: false,
+        createdAt: serverTimestamp(),
+        createdTime: nowStr,
+        history: {
+          cocinero: hasPizza ? null : { action: 'Sin pizzas (directo a embarque)', time: nowStr },
+          embarque: null,
+          repartidor: null
+        }
+      };
+
+      try {
+        const docRef = await addDoc(ordersRef, newOrder);
+        localStorage.setItem('my_active_order_id', docRef.id);
+        cart = [];
+        updateCartUI();
+        closeCartModal();
+        switchView('pedido');
+      } catch (err) {
+        console.error(err);
+        alert("Error al conectar con Firebase. Revisa que hayas pegado tu firebaseConfig.");
+      }
+    };
+
+    // =========================================================================
+    // 6. ESCUCHA EN TIEMPO REAL (CLIENTE Y PANEL ADMIN)
+    // =========================================================================
+    const q = query(ordersRef, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      allOrders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderClientTracker();
+      renderAdminStation();
+    });
+
+    // Vista del Cliente ("Mi Pedido")
+    function renderClientTracker(customOrder = null) {
+      const savedId = localStorage.getItem('my_active_order_id');
+      const order = customOrder || allOrders.find(o => o.id === savedId);
+      const container = document.getElementById('active-order-container');
+      if (!order) return;
+
+      const statusMap = {
+        'pendiente_cocina': 1,
+        'cocinando': 2,
+        'en_embarque': 3,
+        'en_reparto': 4,
+        'entregado': 5
+      };
+      const stepNum = statusMap[order.status] || 1;
+
+      container.innerHTML = `
+        <div class="tracker-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:18px; font-weight:800; color:var(--accent);">Pedido #${order.folio}</span>
+            <span style="font-size:12px; color:var(--text-muted);">${order.createdTime || ''}</span>
+          </div>
+          <p style="font-size:13px; margin-top:4px;">Cliente: <strong>${order.customerName}</strong> • Total: <strong>$${order.total}</strong></p>
+          
+          ${order.isDelayed ? `
+            <div style="background:rgba(239,68,68,0.2); border:1px solid var(--danger); color:#fca5a5; padding:10px; border-radius:10px; margin-top:12px; font-size:12px; font-weight:700;">
+              ⚠️ Tu pedido presenta un ligero retardo por alta demanda. ¡Ya vamos en camino!
+            </div>
+          ` : ''}
+
+          <div class="status-steps">
+            <div class="step ${stepNum >= 1 ? 'done' : ''}">
+              <div class="step-dot"><i class="ph-bold ph-check"></i></div>
+              <div><strong>Pedido Recibido</strong><div style="font-size:11px; color:var(--text-muted);">En cola de preparación</div></div>
+            </div>
+            <div class="step ${stepNum > 2 ? 'done' : (stepNum === 2 ? 'current' : '')}">
+              <div class="step-dot"><i class="ph-fill ph-fire"></i></div>
+              <div><strong>Cocinando</strong><div style="font-size:11px; color:var(--text-muted);">Tu pizza está en el horno artesanal</div></div>
+            </div>
+            <div class="step ${stepNum > 3 ? 'done' : (stepNum === 3 ? 'current' : '')}">
+              <div class="step-dot"><i class="ph-fill ph-package"></i></div>
+              <div><strong>Empacando (Embarque)</strong><div style="font-size:11px; color:var(--text-muted);">Verificando bebidas, postres y caja</div></div>
+            </div>
+            <div class="step ${stepNum > 4 ? 'done' : (stepNum === 4 ? 'current' : '')}">
+              <div class="step-dot"><i class="ph-fill ph-moped"></i></div>
+              <div><strong>En Reparto</strong><div style="font-size:11px; color:var(--text-muted);">El repartidor va rumbo a tu domicilio</div></div>
+            </div>
+            <div class="step ${stepNum === 5 ? 'done' : ''}">
+              <div class="step-dot"><i class="ph-fill ph-house"></i></div>
+              <div><strong>Entregado</strong><div style="font-size:11px; color:var(--text-muted);">¡Buen provecho!</div></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.searchOrderByQuery = () => {
+      const val = document.getElementById('search-order-input').value.replace('#', '').trim();
+      if (!val) return;
+      const found = allOrders.find(o => String(o.folio) === val || o.customerPhone.includes(val));
+      if (found) {
+        localStorage.setItem('my_active_order_id', found.id);
+        renderClientTracker(found);
+      } else {
+        alert("No se encontró ningún pedido con ese folio o teléfono.");
+      }
+    };
+
+    // =========================================================================
+    // 7. BOTÓN SECRETO (6 CLICS AL LOGO) Y ESTACIONES ADMIN
+    // =========================================================================
+    let logoClicks = 0;
+    let logoTimer;
+    document.getElementById('secret-logo-trigger').addEventListener('click', () => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
+      if (logoClicks >= 6) {
+        logoClicks = 0;
+        document.getElementById('admin-login-modal').classList.add('open');
+      }
+    });
+
+    window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.remove('open');
+
+    window.verifyAdminPass = () => {
+      const pass = document.getElementById('admin-pass-input').value;
+      if (pass === ADMIN_PASSWORD) {
+        closeAdminLogin();
+        document.getElementById('admin-pass-input').value = '';
+        switchView('admin');
+        renderAdminStation();
+      } else {
+        alert("Contraseña incorrecta");
+      }
+    };
+
+    window.logoutAdmin = () => switchView('inicio');
+
+    window.setAdminRole = (role, btn) => {
+      currentRole = role;
+      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAdminStation();
+    };
+
+    window.setAdminSubTab = (sub) => {
+      currentSubTab = sub;
+      document.getElementById('btn-sub-activos').classList.toggle('active', sub === 'activos');
+      document.getElementById('btn-sub-historial').classList.toggle('active', sub === 'historial');
+      renderAdminStation();
+    };
+
+    // Avanzar estado en Firebase y guardar historial en cada estación
+    window.updateOrderStage = async (orderId, nextStatus, stationKey, logText) => {
+      const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const ref = doc(db, "pedidos", orderId);
+      await updateDoc(ref, {
+        status: nextStatus,
+        [`history.${stationKey}`]: { action: logText, time: nowStr }
+      });
+    };
+
+    window.toggleDelay = async (orderId, currentDelay) => {
+      const ref = doc(db, "pedidos", orderId);
+      await updateDoc(ref, { isDelayed: !currentDelay });
+    };
+
+    function renderAdminStation() {
+      const container = document.getElementById('admin-orders-list');
+      if (!document.getElementById('view-admin').classList.contains('active')) return;
+
+      let filtered = [];
+
+      // 1. ESTACIÓN COCINERO
+      if (currentRole === 'cocinero') {
+        if (currentSubTab === 'activos') {
+          filtered = allOrders.filter(o => o.status === 'pendiente_cocina' || o.status === 'cocinando');
+        } else {
+          filtered = allOrders.filter(o => o.history && o.history.cocinero && o.history.cocinero.completed);
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay pizzas ${currentSubTab === 'activos' ? 'pendientes' : 'en el historial'}.</p>`;
+          return;
+        }
+
+        container.innerHTML = filtered.map(o => {
+          const pizzasOnly = o.items.filter(i => i.type === 'pizza');
+          return `
+            <div class="order-ticket">
+              <div class="ticket-header">
+                <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
+                <span class="ticket-time">${o.createdTime}</span>
+              </div>
+              <ul class="ticket-items">
+                ${pizzasOnly.map(p => `<li><span><strong>${p.qty}x</strong> ${p.name}</span><span>Horno</span></li>`).join('')}
+              </ul>
+              ${currentSubTab === 'activos' ? `
+                ${o.status === 'pendiente_cocina' 
+                  ? `<button class="btn-action btn-accept" onclick="acceptKitchen('${o.id}')"><i class="ph-bold ph-check"></i> Aceptar Pedido</button>`
+                  : `<button class="btn-action btn-next" onclick="finishKitchen('${o.id}')"><i class="ph-bold ph-fire"></i> Entregado a Embarque</button>`
+                }
+              ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.cocinero.action} (${o.history.cocinero.time})</div>`}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 2. ESTACIÓN CAJERO / EMBARQUE
+      if (currentRole === 'embarque') {
+        if (currentSubTab === 'activos') {
+          filtered = allOrders.filter(o => o.status === 'en_embarque');
+        } else {
+          filtered = allOrders.filter(o => o.history && o.history.embarque);
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay pedidos en embarque.</p>`;
+          return;
+        }
+
+        container.innerHTML = filtered.map(o => `
+          <div class="order-ticket">
+            <div class="ticket-header">
+              <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
+              <span class="pill-status ${o.paymentStatus === 'pagado' ? 'paid-yes' : 'paid-no'}">
+                ${o.paymentStatus === 'pagado' ? 'PAGADO' : `COBRAR $${o.total}`}
+              </span>
+            </div>
+            <ul class="ticket-items">
+              ${o.items.map(i => `
+                <li>
+                  <span><strong>${i.qty}x</strong> ${i.name}</span>
+                  <span style="color:var(--text-muted); font-size:11px;">${i.type === 'pizza' ? '🍕 Lista' : '🥤 Complemento'}</span>
+                </li>
+              `).join('')}
+            </ul>
+            ${currentSubTab === 'activos' ? `
+              <button class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'en_reparto', 'embarque', 'Pedido completo enviado a reparto')">
+                <i class="ph-bold ph-package"></i> Pedido Completo ➔ Enviar a Repartidor
+              </button>
+            ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.embarque.action} (${o.history.embarque.time})</div>`}
+          </div>
+        `).join('');
+      }
+
+      // 3. ESTACIÓN REPARTIDOR
+      if (currentRole === 'repartidor') {
+        if (currentSubTab === 'activos') {
+          filtered = allOrders.filter(o => o.status === 'en_reparto');
+        } else {
+          filtered = allOrders.filter(o => o.history && o.history.repartidor);
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:24px;">No hay entregas en ruta.</p>`;
+          return;
+        }
+
+        container.innerHTML = filtered.map(o => {
+          const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${o.coords.lat},${o.coords.lng}`;
+          return `
+            <div class="order-ticket">
+              <div class="ticket-header">
+                <span class="ticket-id">Pedido #${o.folio} — ${o.customerName}</span>
+                <span class="pill-status ${o.paymentStatus === 'pagado' ? 'paid-yes' : 'paid-no'}">
+                  ${o.paymentStatus === 'pagado' ? 'YA PAGADO' : `COBRAR: $${o.total}`}
+                </span>
+              </div>
+              <p style="font-size:12px; margin-bottom:4px;"><i class="ph-fill ph-phone"></i> Tel: <a href="tel:${o.customerPhone}" style="color:var(--accent);">${o.customerPhone}</a></p>
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;"><i class="ph-fill ph-map-pin"></i> ${o.address}</p>
+              
+              <ul class="ticket-items">
+                ${o.items.map(i => `<li><span>${i.qty}x ${i.name}</span><span>$${i.price * i.qty}</span></li>`).join('')}
+              </ul>
+
+              ${currentSubTab === 'activos' ? `
+                <div id="driver-map-${o.id}" class="driver-map"></div>
+                <a href="${mapsUrl}" target="_blank" class="btn-action btn-maps">
+                  <i class="ph-bold ph-navigation-arrow"></i> Abrir Ruta en Google Maps
+                </a>
+                <button class="btn-action btn-delay" onclick="toggleDelay('${o.id}', ${o.isDelayed})">
+                  <i class="ph-bold ph-warning"></i> ${o.isDelayed ? 'Quitar aviso de retardo' : 'Reportar Retardo al Cliente'}
+                </button>
+                <button class="btn-action btn-next" onclick="updateOrderStage('${o.id}', 'entregado', 'repartidor', 'Entregado al cliente')">
+                  <i class="ph-bold ph-check-circle"></i> Marcar como Entregado
+                </button>
+              ` : `<div style="font-size:12px; color:var(--success);">✅ ${o.history.repartidor.action} (${o.history.repartidor.time})</div>`}
+            </div>
+          `;
+        }).join('');
+
+        // Renderizar los minimapas de cada entrega activa
+        if (currentSubTab === 'activos') {
+          setTimeout(() => {
+            filtered.forEach(o => {
+              const mapEl = document.getElementById(`driver-map-${o.id}`);
+              if (mapEl && !mapEl._leaflet_id) {
+                const dMap = L.map(mapEl, { zoomControl: false }).setView([o.coords.lat, o.coords.lng], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(dMap);
+                L.marker([o.coords.lat, o.coords.lng]).addTo(dMap);
+              }
+            });
+          }, 150);
+        }
+      }
+    }
+
+    // Funciones auxiliares para Cocinero (Aceptar -> Cocinando, Terminar -> Embarque + Historial)
+    window.acceptKitchen = async (orderId) => {
+      const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      await updateDoc(doc(db, "pedidos", orderId), {
+        status: 'cocinando',
+        'history.cocinero': { acceptedAt: nowStr, completed: false }
+      });
+    };
+
+    window.finishKitchen = async (orderId) => {
+      const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const order = allOrders.find(o => o.id === orderId);
+      const acceptedAt = order?.history?.cocinero?.acceptedAt || nowStr;
+      await updateDoc(doc(db, "pedidos", orderId), {
+        status: 'en_embarque',
+        'history.cocinero': {
+          acceptedAt,
+          time: nowStr,
+          completed: true,
+          action: `Aceptado ${acceptedAt} ➔ Listo ${nowStr}`
+        }
+      });
+    };
+
+    // =========================================================================
+    // 8. NAVEGACIÓN ENTRE VISTAS
+    // =========================================================================
+    window.switchView = (viewName) => {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      const navBtn = document.getElementById(`nav-${viewName}`);
+      if (navBtn) navBtn.classList.add('active');
+      window.scrollTo(0, 0);
+    };
+  </script>
+</body>
+</html>
