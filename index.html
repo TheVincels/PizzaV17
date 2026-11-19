@@ -264,15 +264,32 @@
 
     /* MODALS */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.82);
-      z-index: 100; display: none; align-items: flex-end; justify-content: center;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 120; display: none; align-items: center; justify-content: center;
+      padding: 12px;
     }
     .modal-overlay.open { display: flex; }
     .modal-sheet {
       background: var(--bg-card); width: 100%; max-width: 520px;
-      max-height: 92vh; overflow-y: auto;
-      border-radius: 22px 22px 0 0; border-top: 1px solid var(--border);
-      padding: 20px;
+      max-height: 90vh; overflow-y: auto;
+      border-radius: 20px; border: 1px solid var(--border);
+      padding: 0 18px 24px 18px;
+      position: relative;
+    }
+    .modal-sticky-header {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--bg-card);
+      padding: 16px 0 12px 0;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-close-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--bg-dark); border: 1px solid var(--border);
+      color: var(--text-main); font-size: 20px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
     }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted); }
@@ -281,7 +298,7 @@
       background: var(--bg-dark); border: 1px solid var(--border);
       color: var(--text-main); font-family: inherit; font-size: 14px;
     }
-    #client-map, .driver-map { height: 180px; width: 100%; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px; z-index: 1; }
+    #client-map, .driver-map { height: 170px; width: 100%; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px; z-index: 1; }
 
     /* ADMIN PANEL */
     .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
@@ -417,20 +434,20 @@
     <section class="section-container">
       <div class="section-header">
         <h3 class="section-title">Panel <span>Operativo</span></h3>
-        <button onclick="logoutAdmin()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:8px; font-size:12px;">Salir</button>
+        <button type="button" onclick="logoutAdmin()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:8px; font-size:12px;">Salir</button>
       </div>
 
       <!-- 3 Roles -->
       <div class="admin-tabs">
-        <button class="admin-tab active" onclick="setAdminRole('cocinero', this)">👨‍🍳 Cocinero</button>
-        <button class="admin-tab" onclick="setAdminRole('embarque', this)">📦 Embarque</button>
-        <button class="admin-tab" onclick="setAdminRole('repartidor', this)">🛵 Repartidor</button>
+        <button type="button" class="admin-tab active" onclick="setAdminRole('cocinero', this)">👨‍🍳 Cocinero</button>
+        <button type="button" class="admin-tab" onclick="setAdminRole('embarque', this)">📦 Embarque</button>
+        <button type="button" class="admin-tab" onclick="setAdminRole('repartidor', this)">🛵 Repartidor</button>
       </div>
 
       <!-- Activos vs Historial de la estación -->
       <div class="sub-toggle">
-        <button class="sub-btn active" id="btn-sub-activos" onclick="setAdminSubTab('activos')">Pendientes en turno</button>
-        <button class="sub-btn" id="btn-sub-historial" onclick="setAdminSubTab('historial')">Historial guardado</button>
+        <button type="button" class="sub-btn active" id="btn-sub-activos" onclick="setAdminSubTab('activos')">Pendientes en turno</button>
+        <button type="button" class="sub-btn" id="btn-sub-historial" onclick="setAdminSubTab('historial')">Historial guardado</button>
       </div>
 
       <div id="admin-orders-list"></div>
@@ -448,11 +465,11 @@
 
   <!-- BARRA DE NAVEGACIÓN INFERIOR -->
   <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-inicio" onclick="switchView('inicio')">
+    <button type="button" class="nav-item active" id="nav-inicio" onclick="switchView('inicio')">
       <i class="ph-fill ph-house"></i>
       <span>Inicio</span>
     </button>
-    <button class="nav-item" id="nav-pedido" onclick="switchView('pedido')">
+    <button type="button" class="nav-item" id="nav-pedido" onclick="switchView('pedido')">
       <i class="ph-fill ph-moped"></i>
       <span>Mi Pedido</span>
     </button>
@@ -460,15 +477,15 @@
 
   <!-- MODAL CARRITO Y CHECKOUT -->
   <div class="modal-overlay" id="cart-modal">
-    <div class="modal-sheet">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <div class="modal-sheet" id="cart-modal-sheet">
+      <div class="modal-sticky-header">
         <h3 style="font-size:18px; font-weight:800;">Tu Pedido</h3>
-        <button onclick="closeCartModal()" style="background:none; border:none; color:var(--text-muted); font-size:24px;">&times;</button>
+        <button type="button" class="modal-close-btn" onclick="closeCartModal()" aria-label="Cerrar">&times;</button>
       </div>
 
-      <div id="cart-items-list" style="margin-bottom:16px;"></div>
+      <div id="cart-items-list" style="margin-bottom:14px;"></div>
 
-      <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:14px;">
         <span>Total a pagar:</span>
         <span id="modal-total" style="color:var(--accent);">$0</span>
       </div>
@@ -501,7 +518,7 @@
           <div id="client-map"></div>
         </div>
 
-        <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px;">
+        <button type="submit" id="btn-submit-order" class="btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px; margin-top:8px;">
           Confirmar y Enviar Pedido
         </button>
       </form>
@@ -510,7 +527,7 @@
 
   <!-- MODAL CONTRASEÑA ADMIN -->
   <div class="modal-overlay" id="admin-login-modal">
-    <div class="modal-sheet" style="max-width:380px; border-radius:22px; margin:auto;">
+    <div class="modal-sheet" style="max-width:380px; padding-top:16px;">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Acceso Personal</h3>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa la contraseña operativa para abrir las estaciones.</p>
       <input type="password" id="admin-pass-input" class="form-control" placeholder="Contraseña" style="margin-bottom:12px;">
@@ -640,7 +657,7 @@
             </div>
             <div class="product-footer">
               <span class="product-price">$${p.price}</span>
-              <button class="add-btn" onclick="addToCart('${p.id}')">+</button>
+              <button type="button" class="add-btn" onclick="addToCart('${p.id}')">+</button>
             </div>
           </div>
         </div>
@@ -709,9 +726,9 @@
             <div style="font-size:12px; color:var(--accent);">$${item.price * item.qty}</div>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
-            <button type="button" onclick="changeQty('${item.id}', -1)" style="width:26px; height:26px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border); color:#fff;">-</button>
+            <button type="button" onclick="changeQty('${item.id}', -1)" style="width:28px; height:28px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border); color:#fff;">-</button>
             <span style="font-weight:700;">${item.qty}</span>
-            <button type="button" onclick="changeQty('${item.id}', 1)" style="width:26px; height:26px; border-radius:50%; background:var(--accent); border:none; color:#fff;">+</button>
+            <button type="button" onclick="changeQty('${item.id}', 1)" style="width:28px; height:28px; border-radius:50%; background:var(--accent); border:none; color:#fff;">+</button>
           </div>
         </div>
       `).join('');
@@ -721,7 +738,10 @@
 
     window.openCartModal = () => {
       renderCartModalItems();
-      document.getElementById('cart-modal').classList.add('open');
+      const modal = document.getElementById('cart-modal');
+      const sheet = document.getElementById('cart-modal-sheet');
+      modal.classList.add('open');
+      sheet.scrollTop = 0;
       setTimeout(() => {
         if (!clientMap) {
           clientMap = L.map('client-map').setView([selectedCoords.lat, selectedCoords.lng], 15);
@@ -755,6 +775,10 @@
       e.preventDefault();
       if (cart.length === 0) return alert("Agrega al menos un producto.");
 
+      const submitBtn = document.getElementById('btn-submit-order');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Enviando pedido...";
+
       const folio = Math.floor(100 + Math.random() * 900);
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
@@ -785,11 +809,15 @@
         localStorage.setItem('my_active_order_id', docRef.id);
         cart = [];
         updateCartUI();
+        document.getElementById('checkout-form').reset();
         closeCartModal();
         switchView('pedido');
       } catch (err) {
         console.error(err);
-        alert("Error al conectar con Firebase. Revisa que Firestore esté creado y en modo de prueba.");
+        alert("Error al enviar pedido a Firebase. Verifica que Firestore esté creado y en modo de prueba.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Confirmar y Enviar Pedido";
       }
     };
 
@@ -942,7 +970,6 @@
 
       let filtered = [];
 
-      // 1. ESTACIÓN COCINERO
       if (currentRole === 'cocinero') {
         if (currentSubTab === 'activos') {
           filtered = allOrders.filter(o => o.status === 'pendiente_cocina' || o.status === 'cocinando');
@@ -977,7 +1004,6 @@
         }).join('');
       }
 
-      // 2. ESTACIÓN CAJERO / EMBARQUE
       if (currentRole === 'embarque') {
         if (currentSubTab === 'activos') {
           filtered = allOrders.filter(o => o.status === 'en_embarque');
@@ -1015,7 +1041,6 @@
         `).join('');
       }
 
-      // 3. ESTACIÓN REPARTIDOR
       if (currentRole === 'repartidor') {
         if (currentSubTab === 'activos') {
           filtered = allOrders.filter(o => o.status === 'en_reparto');
@@ -1061,7 +1086,6 @@
           `;
         }).join('');
 
-        // Renderizar los minimapas de cada entrega activa
         if (currentSubTab === 'activos') {
           setTimeout(() => {
             filtered.forEach(o => {
@@ -1077,7 +1101,6 @@
       }
     }
 
-    // Funciones auxiliares para Cocinero (Aceptar -> Cocinando, Terminar -> Embarque + Historial)
     window.acceptKitchen = async (orderId) => {
       const nowStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
       await updateDoc(doc(db, "pedidos", orderId), {
