@@ -488,6 +488,39 @@
       font-size: 14px;
     }
 
+    .file-picker-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-dark);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .file-preview-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+
+    .btn-pick-file {
+      background: var(--bg-elevated);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .saved-profile-note {
       font-size: 11px;
       color: var(--success);
@@ -503,20 +536,6 @@
       margin-top: 6px;
       z-index: 1;
     }
-
-    .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
-    .admin-tab {
-      padding: 10px 6px;
-      border-radius: 12px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-      cursor: pointer;
-    }
-    .admin-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     .sub-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
     .sub-btn {
@@ -682,28 +701,19 @@
     </section>
   </main>
 
-  <!-- PANEL ADMIN OPERATIVO Y DUEÑO -->
+  <!-- PANTALLA AISLADA POR CONTRASEÑA -->
   <main id="view-admin" class="view">
     <section class="section-container">
       <div class="section-header">
-        <h3 class="section-title" id="admin-panel-title">Panel <span>Operativo</span></h3>
+        <h3 class="section-title" id="admin-panel-title">Panel</h3>
         <button type="button" onclick="logoutAdmin()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:8px; font-size:12px;">Salir</button>
       </div>
 
-      <!-- Barra de estaciones para roles operativos -->
-      <div class="admin-tabs" id="station-tabs-bar">
-        <button type="button" class="admin-tab active" id="tab-cocinero" onclick="setAdminRole('cocinero', this)">Cocinero</button>
-        <button type="button" class="admin-tab" id="tab-embarque" onclick="setAdminRole('embarque', this)">Embarque</button>
-        <button type="button" class="admin-tab" id="tab-repartidor" onclick="setAdminRole('repartidor', this)">Repartidor</button>
-      </div>
-
-      <!-- Sub-pestañas para estación operativa -->
       <div class="sub-toggle" id="station-sub-toggle">
         <button type="button" class="sub-btn active" id="btn-sub-activos" onclick="setAdminSubTab('activos')">Pendientes en turno</button>
         <button type="button" class="sub-btn" id="btn-sub-historial" onclick="setAdminSubTab('historial')">Historial guardado</button>
       </div>
 
-      <!-- Sub-pestañas para modo Dueño (2549) -->
       <div class="sub-toggle" id="owner-sub-toggle" style="display:none;">
         <button type="button" class="sub-btn active" id="btn-owner-reporte" onclick="setOwnerSubTab('reporte')">Ventas y Retardos</button>
         <button type="button" class="sub-btn" id="btn-owner-menu" onclick="setOwnerSubTab('menu')">Editar Productos</button>
@@ -792,11 +802,11 @@
     </div>
   </div>
 
-  <!-- MODAL CONTRASEÑA ADMIN -->
+  <!-- MODAL CONTRASEÑA -->
   <div class="modal-overlay" id="admin-login-modal">
     <div class="modal-sheet" style="max-width:380px; padding-top:16px;">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Acceso Personal</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa tu clave de estación o administración.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Ingresa tu contraseña para abrir tu pantalla asignada.</p>
       <input type="password" id="admin-pass-input" class="form-control" placeholder="Contraseña" style="margin-bottom:12px;">
       <div style="display:flex; gap:8px;">
         <button type="button" onclick="closeAdminLogin()" style="flex:1; padding:11px; border-radius:10px; background:var(--bg-dark); border:1px solid var(--border); color:var(--text-muted); font-weight:700;">Cancelar</button>
@@ -907,6 +917,7 @@
     ];
 
     let products = [...DEFAULT_PRODUCTS];
+    const draftImages = {};
     let activeCategory = 'todos';
     let cart = [];
     let allOrders = [];
@@ -978,7 +989,6 @@
       renderCatalog();
     };
 
-    // Escuchar catálogo en Firebase (si aún no hay documentos, usa DEFAULT_PRODUCTS)
     onSnapshot(menuRef, (snapshot) => {
       if (!snapshot.empty) {
         const remoteMap = new Map(snapshot.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
@@ -997,12 +1007,65 @@
 
     renderCatalog();
 
+    // Comprimir imagen elegida del dispositivo para guardarla de forma ligera
+    function compressDeviceImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 640;
+            let w = img.width;
+            let h = img.height;
+            if (w > h && w > maxDim) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else if (h >= w && h > maxDim) {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.78));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.handleDeviceImagePick = async (prodId, inputEl) => {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      try {
+        const compressedDataUrl = await compressDeviceImage(file);
+        draftImages[prodId] = compressedDataUrl;
+        const previewEl = document.getElementById(`preview-img-${prodId}`);
+        if (previewEl) previewEl.src = compressedDataUrl;
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo leer la imagen seleccionada.");
+      }
+    };
+
     window.addToCart = (id) => {
       const prod = products.find(p => p.id === id);
       if (!prod || prod.comingSoon) return;
       const existing = cart.find(item => item.id === id);
       if (existing) existing.qty++;
-      else cart.push({ ...prod, qty: 1 });
+      else cart.push({
+        id: prod.id,
+        name: prod.name,
+        category: prod.category,
+        type: prod.type,
+        price: prod.price,
+        qty: 1
+      });
       updateCartUI();
     };
 
@@ -1264,14 +1327,12 @@
       document.getElementById('admin-pass-input').value = '';
       adminMode = cfg.mode;
 
-      const tabsBar = document.getElementById('station-tabs-bar');
       const stationSub = document.getElementById('station-sub-toggle');
       const ownerSub = document.getElementById('owner-sub-toggle');
       const titleEl = document.getElementById('admin-panel-title');
 
       if (cfg.mode === 'owner') {
         titleEl.innerHTML = `Reporte y <span>Menú</span>`;
-        tabsBar.style.display = 'none';
         stationSub.style.display = 'none';
         ownerSub.style.display = 'flex';
         ownerSubTab = 'reporte';
@@ -1279,13 +1340,12 @@
         document.getElementById('btn-owner-menu').classList.remove('active');
       } else {
         currentRole = cfg.role;
-        titleEl.innerHTML = `Panel <span>${cfg.label}</span>`;
-        tabsBar.style.display = 'grid';
+        currentSubTab = 'activos';
+        titleEl.innerHTML = `Pantalla <span>${cfg.label}</span>`;
         stationSub.style.display = 'flex';
         ownerSub.style.display = 'none';
-        document.querySelectorAll('.admin-tab').forEach(btn => {
-          btn.classList.toggle('active', btn.id === `tab-${cfg.role}`);
-        });
+        document.getElementById('btn-sub-activos').classList.add('active');
+        document.getElementById('btn-sub-historial').classList.remove('active');
       }
 
       switchView('admin');
@@ -1303,13 +1363,6 @@
     };
 
     window.logoutAdmin = () => switchView('inicio');
-
-    window.setAdminRole = (role, btn) => {
-      currentRole = role;
-      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderAdminStation();
-    };
 
     window.setAdminSubTab = (sub) => {
       currentSubTab = sub;
@@ -1331,7 +1384,7 @@
       const name = document.getElementById(`edit-name-${prodId}`).value.trim() || base.name;
       const price = Number(document.getElementById(`edit-price-${prodId}`).value) || base.price;
       const desc = document.getElementById(`edit-desc-${prodId}`).value.trim();
-      const img = document.getElementById(`edit-img-${prodId}`).value.trim() || base.img;
+      const img = draftImages[prodId] || base.img;
       const comingSoon = document.getElementById(`edit-soon-${prodId}`).checked;
 
       try {
@@ -1343,7 +1396,8 @@
           img,
           comingSoon
         }, { merge: true });
-        alert(`"${name}" actualizado.`);
+        delete draftImages[prodId];
+        alert(`"${name}" guardado.`);
       } catch (err) {
         console.error(err);
         alert("No se pudo guardar el producto en Firebase.");
@@ -1368,34 +1422,45 @@
 
       if (adminMode === 'owner') {
         if (ownerSubTab === 'menu') {
-          container.innerHTML = products.map(p => `
-            <div class="edit-product-card">
-              <div class="ticket-header">
-                <span class="ticket-id">${p.id}</span>
-                <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gold); cursor:pointer;">
-                  <input type="checkbox" id="edit-soon-${p.id}" ${p.comingSoon ? 'checked' : ''}>
-                  Próximamente
-                </label>
+          container.innerHTML = products.map(p => {
+            const currentThumb = draftImages[p.id] || p.img;
+            return `
+              <div class="edit-product-card">
+                <div class="ticket-header">
+                  <span class="ticket-id">${p.name}</span>
+                  <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gold); cursor:pointer;">
+                    <input type="checkbox" id="edit-soon-${p.id}" ${p.comingSoon ? 'checked' : ''}>
+                    Próximamente
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>Nombre</label>
+                  <input type="text" id="edit-name-${p.id}" class="form-control" value="${p.name.replace(/"/g, '&quot;')}">
+                </div>
+                <div class="form-group">
+                  <label>Precio ($ MXN)</label>
+                  <input type="number" id="edit-price-${p.id}" class="form-control" value="${p.price}">
+                </div>
+                <div class="form-group">
+                  <label>Descripción</label>
+                  <input type="text" id="edit-desc-${p.id}" class="form-control" value="${(p.desc || '').replace(/"/g, '&quot;')}">
+                </div>
+                <div class="form-group">
+                  <label>Imagen desde tu dispositivo</label>
+                  <div class="file-picker-box">
+                    <img id="preview-img-${p.id}" src="${currentThumb}" alt="${p.name}" class="file-preview-thumb">
+                    <div>
+                      <input type="file" id="file-input-${p.id}" accept="image/*" style="display:none;" onchange="handleDeviceImagePick('${p.id}', this)">
+                      <button type="button" class="btn-pick-file" onclick="document.getElementById('file-input-${p.id}').click()">
+                        <i class="ph-bold ph-upload-simple"></i> Elegir de mi dispositivo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn-action btn-next" onclick="saveProductEdit('${p.id}')">Guardar Cambios del Producto</button>
               </div>
-              <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="edit-name-${p.id}" class="form-control" value="${p.name.replace(/"/g, '&quot;')}">
-              </div>
-              <div class="form-group">
-                <label>Precio ($ MXN)</label>
-                <input type="number" id="edit-price-${p.id}" class="form-control" value="${p.price}">
-              </div>
-              <div class="form-group">
-                <label>Descripción</label>
-                <input type="text" id="edit-desc-${p.id}" class="form-control" value="${(p.desc || '').replace(/"/g, '&quot;')}">
-              </div>
-              <div class="form-group">
-                <label>URL o ruta de imagen</label>
-                <input type="text" id="edit-img-${p.id}" class="form-control" value="${(p.img || '').replace(/"/g, '&quot;')}">
-              </div>
-              <button type="button" class="btn-action btn-next" onclick="saveProductEdit('${p.id}')">Guardar Cambios del Producto</button>
-            </div>
-          `).join('');
+            `;
+          }).join('');
           return;
         }
 
